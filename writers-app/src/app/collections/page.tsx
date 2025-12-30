@@ -1,12 +1,17 @@
-import { prisma } from "@/lib/db";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export default async function CollectionsPage() {
-  const collections = await prisma.collection.findMany({
+async function getCollections() {
+  const { prisma } = await import("@/lib/db");
+  return prisma.collection.findMany({
     orderBy: { createdAt: "desc" },
   });
+}
+
+export default async function CollectionsPage() {
+  const collections = await getCollections();
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
