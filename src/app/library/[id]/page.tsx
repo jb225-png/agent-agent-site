@@ -59,7 +59,7 @@ export default async function PieceDetailPage({
       {/* Run Agents Button */}
       {!piece.archivistTags && !piece.placement && (
         <div className="mb-8 p-6 border border-black bg-gray-50">
-          <p className="mb-4">This piece hasn't been analyzed yet. Run the agent pipeline to get:</p>
+          <p className="mb-4">This piece hasn&apos;t been analyzed yet. Run the agent pipeline to get:</p>
           <ul className="list-disc list-inside mb-4 text-sm space-y-1">
             <li>Themes, voice tags, quality assessment (Archivist)</li>
             <li>Placement decision and recommended action (Placement Agent)</li>
