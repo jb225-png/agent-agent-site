@@ -1,5 +1,12 @@
 {
-  "buildCommand": "npm --prefix writers-app run build:vercel",
-  "outputDirectory": "writers-app/.next",
-  "installCommand": "npm --prefix writers-app install"
+  "version": 2,
+  "builds": [
+    {
+      "src": "writers-app/package.json",
+      "use": "@vercel/next",
+      "config": {
+        "buildCommand": "prisma generate && next build"
+      }
+    }
+  ]
 }
