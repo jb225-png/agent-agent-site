@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { runArchivistOnPiece, runPlacementOnPiece, runRepurposerOnPiece } from "@/services/agents";
 
 /**
+ * Sleep helper to add delays between API calls
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
  * Run all agents on a piece
  * POST /api/agents/run
  * Body: { pieceId: string }
@@ -17,12 +24,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Run agents in sequence
+    // Run agents in sequence with delays to avoid rate limits
     console.log(`Running Archivist on piece ${pieceId}...`);
     const archivistResult = await runArchivistOnPiece(pieceId);
 
+    // Small delay between agents
+    await sleep(1000);
+
     console.log(`Running Placement on piece ${pieceId}...`);
     const placementResult = await runPlacementOnPiece(pieceId);
+
+    // Small delay between agents
+    await sleep(1000);
 
     console.log(`Running Repurposer on piece ${pieceId}...`);
     const repurposerResult = await runRepurposerOnPiece(pieceId);
