@@ -219,7 +219,14 @@ function mockExecutive(pieces: any[]) {
 }
 
 /**
- * OpenAI agent implementation
+ * Sleep helper for retry delays
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * OpenAI agent implementation with retry logic
  */
 async function runOpenAIAgent(
   agentName: AgentName,
@@ -233,47 +240,76 @@ async function runOpenAIAgent(
   const userPrompt = getUserPrompt(agentName, input);
   const schema = getSchema(agentName);
 
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.3,
-        response_format: { type: "json_object" },
-      }),
-    });
+  const maxRetries = 3;
+  let lastError: Error | null = null;
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`);
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      // Add delay between retries (exponential backoff)
+      if (attempt > 0) {
+        const delayMs = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+        console.log(`Retry attempt ${attempt} for ${agentName} after ${delayMs}ms delay`);
+        await sleep(delayMs);
+      }
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.3,
+          response_format: { type: "json_object" },
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+
+        // If rate limited (429), retry
+        if (response.status === 429 && attempt < maxRetries) {
+          console.warn(`Rate limited on ${agentName}, will retry...`);
+          lastError = new Error(`OpenAI API error: Too Many Requests`);
+          continue;
+        }
+
+        throw new Error(`OpenAI API error: ${response.statusText} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      const parsed = JSON.parse(content);
+
+      // Validate with Zod
+      const validated = schema.parse(parsed);
+      return validated;
+    } catch (error: any) {
+      lastError = error;
+
+      // If ZodError, fall back to mock
+      if (error.name === "ZodError") {
+        console.warn("Invalid JSON from LLM, falling back to mock...");
+        return runMockAgent(agentName, input);
+      }
+
+      // If not the last attempt and it's a network/rate limit error, continue
+      if (attempt < maxRetries && (error.message.includes("Too Many Requests") || error.message.includes("fetch"))) {
+        continue;
+      }
+
+      // Otherwise, throw
+      throw error;
     }
-
-    const data = await response.json();
-    const content = data.choices[0].message.content;
-    const parsed = JSON.parse(content);
-
-    // Validate with Zod
-    const validated = schema.parse(parsed);
-    return validated;
-  } catch (error: any) {
-    console.error(`Agent ${agentName} failed:`, error);
-
-    // Attempt repair once
-    if (error.name === "ZodError") {
-      console.warn("Invalid JSON from LLM, attempting repair...");
-      // For now, fall back to mock
-      return runMockAgent(agentName, input);
-    }
-
-    throw new Error(`Agent ${agentName} failed: ${error.message}`);
   }
+
+  console.error(`Agent ${agentName} failed after ${maxRetries} retries:`, lastError);
+  throw new Error(`Agent ${agentName} failed: ${lastError?.message}`);
 }
 
 function getSystemPrompt(agentName: AgentName): string {
