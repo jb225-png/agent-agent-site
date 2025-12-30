@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd writers-app && npx prisma generate && npm run build",
+  "buildCommand": "npm --prefix writers-app run build:vercel",
   "outputDirectory": "writers-app/.next",
-  "installCommand": "cd writers-app && npm install"
+  "installCommand": "npm --prefix writers-app install"
 }
