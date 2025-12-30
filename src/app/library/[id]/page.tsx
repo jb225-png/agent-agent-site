@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
+import RunAgentsButton from "./RunAgentsButton";
 
 async function getPrisma() {
   const { prisma } = await import("@/lib/db");
@@ -54,6 +55,25 @@ export default async function PieceDetailPage({
           <span>Source: {piece.source}</span>
         </div>
       </div>
+
+      {/* Run Agents Button */}
+      {!piece.archivistTags && !piece.placement && (
+        <div className="mb-8 p-6 border border-black bg-gray-50">
+          <p className="mb-4">This piece hasn't been analyzed yet. Run the agent pipeline to get:</p>
+          <ul className="list-disc list-inside mb-4 text-sm space-y-1">
+            <li>Themes, voice tags, quality assessment (Archivist)</li>
+            <li>Placement decision and recommended action (Placement Agent)</li>
+            <li>Repurposed content for different platforms (Repurposer)</li>
+          </ul>
+          <RunAgentsButton pieceId={piece.id} />
+        </div>
+      )}
+
+      {(piece.archivistTags || piece.placement) && (
+        <div className="mb-4">
+          <RunAgentsButton pieceId={piece.id} />
+        </div>
+      )}
 
       <div className="grid md:grid-cols-2 gap-8 mb-8">
         {/* Archivist Tags */}
