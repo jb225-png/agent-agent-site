@@ -1,9 +1,14 @@
-import { prisma } from "@/lib/db";
 import { format, startOfWeek } from "date-fns";
+
+async function getPrisma() {
+  const { prisma } = await import("@/lib/db");
+  return prisma;
+}
 
 export const dynamic = "force-dynamic";
 
 export default async function QueuePage() {
+  const prisma = await getPrisma();
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
 
   const queue = await prisma.weeklyQueue.findFirst({

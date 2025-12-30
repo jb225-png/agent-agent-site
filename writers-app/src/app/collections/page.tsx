@@ -1,9 +1,14 @@
-import { prisma } from "@/lib/db";
 import Link from "next/link";
+
+async function getPrisma() {
+  const { prisma } = await import("@/lib/db");
+  return prisma;
+}
 
 export const dynamic = "force-dynamic";
 
 export default async function CollectionsPage() {
+  const prisma = await getPrisma();
   const collections = await prisma.collection.findMany({
     orderBy: { createdAt: "desc" },
   });
