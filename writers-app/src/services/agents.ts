@@ -1,4 +1,4 @@
-
+const prisma = await getPrisma();
 import { runAgent } from "@/lib/llm";
 import { startOfWeek } from "date-fns";
 async function getPrisma() {
