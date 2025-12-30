@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ingestText } from "@/services/ingestion";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,14 +16,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 🔑 Lazy import: only load ingestion when endpoint is actually called
+    const { ingestText } = await import("@/services/ingestion");
+
     const result = await ingestText(content, title || "paste");
 
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("Paste upload error:", error);
     return NextResponse.json(
-      { error: error.message || "Upload failed" },
+      { error: error?.message || "Upload failed" },
       { status: 500 }
     );
   }
 }
+
