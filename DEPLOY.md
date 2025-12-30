@@ -2,7 +2,12 @@
 
 ## Quick Deploy
 
-The repository is pre-configured with `vercel.json` and a root `package.json` that automatically handle the subdirectory setup. Just push and deploy!
+The Next.js app is now at the repository root. Vercel will auto-detect and deploy it automatically.
+
+1. Push to GitHub
+2. Vercel auto-deploys
+3. Add environment variables (see below)
+4. Done!
 
 ## Environment Variables Required
 
@@ -20,31 +25,16 @@ LLM_MODE=openai
 OPENAI_API_KEY=sk-your-key-here
 ```
 
-## How It Works
+## Vercel Auto-Detection
 
-The Next.js app is in `writers-app/` subdirectory. The build is configured via:
+Vercel automatically detects:
+- **Framework**: Next.js
+- **Build Command**: `npm run build` (runs `next build`)
+- **Output Directory**: `.next`
+- **Install Command**: `npm install`
+- **Node Version**: 18.x (from package.json engines or Vercel default)
 
-- **`vercel.json`** - Specifies build commands and output directory
-  ```json
-  {
-    "buildCommand": "cd writers-app && npx prisma generate && npm run build",
-    "outputDirectory": "writers-app/.next",
-    "installCommand": "cd writers-app && npm install"
-  }
-  ```
-
-- **`package.json`** (root) - Delegates scripts to subdirectory for local dev consistency
-
-Vercel automatically detects these and builds correctly.
-
-## Build Process
-
-When you push to GitHub, Vercel will:
-
-1. Run `cd writers-app && npm install`
-2. Run `cd writers-app && npx prisma generate` (creates Prisma client)
-3. Run `cd writers-app && npm run build` (builds Next.js)
-4. Serve from `writers-app/.next` output directory
+The `build:vercel` script in package.json runs `prisma generate && next build` if needed.
 
 ## Database Considerations
 
@@ -65,33 +55,17 @@ To migrate:
 ## Deployment Checklist
 
 - [ ] Push code to GitHub
-- [ ] Connect repository to Vercel (if not already)
+- [ ] Vercel auto-deploys (or connect repo if first time)
 - [ ] Add `DATABASE_URL` environment variable
 - [ ] Add `LLM_MODE` environment variable
 - [ ] (Optional) Add `OPENAI_API_KEY` for real LLM mode
-- [ ] Deploy
+- [ ] Verify deployment succeeds
 - [ ] Test upload functionality
 - [ ] Test pipeline execution
-
-## Troubleshooting
-
-### Build fails with "Cannot find module '@prisma/client'"
-→ This is fixed - Prisma is generated in build command
-
-### Environment variables not working
-→ Redeploy after adding variables (doesn't auto-apply to existing deployments)
-
-### Pages return 500 errors
-→ Check Vercel logs (Deployments → select deployment → Runtime Logs)
-→ Verify `DATABASE_URL` is set correctly
-
-### Uploaded pieces disappear after deployment
-→ Expected with SQLite - migrate to hosted database for persistence
 
 ## Local Development
 
 ```bash
-cd writers-app
 npm install
 npx prisma generate
 npx prisma db push
@@ -100,23 +74,34 @@ npm run dev
 
 Open http://localhost:3000
 
-## Alternative: Move to Root
+## Troubleshooting
 
-If you prefer to simplify, you can move everything to the repository root:
+### Build fails with "Cannot find module '@prisma/client'"
+→ Vercel should auto-run prisma generate via postinstall
+→ If not, check that prisma is in devDependencies
 
-```bash
-# Move writers-app contents to root
-mv writers-app/* .
-mv writers-app/.* . 2>/dev/null
-rm -rf writers-app
+### Environment variables not working
+→ Redeploy after adding variables (doesn't auto-apply to existing deployments)
+→ Go to Deployments → select deployment → click "Redeploy"
 
-# Delete monorepo config files
-rm package.json vercel.json
+### Pages return 500 errors
+→ Check Vercel logs: Deployments → select deployment → Runtime Logs
+→ Verify `DATABASE_URL` is set correctly
+→ Check for missing environment variables
 
-# Push changes
-git add -A
-git commit -m "Move Next.js app to repository root"
-git push
-```
+### Uploaded pieces disappear after deployment
+→ Expected with SQLite - migrate to hosted database for persistence
 
-Vercel will auto-detect Next.js at root and deploy normally.
+### First deployment after moving to root
+→ If you had previous failed deployments, Vercel will retry automatically
+→ Or manually trigger: Deployments → click "Redeploy"
+
+## Build Configuration
+
+No special configuration needed! Vercel's Next.js integration handles everything automatically when the app is at the repository root.
+
+If you need to customize:
+- Go to Project Settings → General → Build & Development Settings
+- Framework Preset: Next.js (auto-detected)
+- Build Command: `npm run build` (default)
+- Output Directory: `.next` (default)
