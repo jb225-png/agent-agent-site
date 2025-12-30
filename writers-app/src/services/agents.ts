@@ -1,6 +1,10 @@
-import { prisma } from "@/lib/db";
+
 import { runAgent } from "@/lib/llm";
 import { startOfWeek } from "date-fns";
+async function getPrisma() {
+  const { prisma } = await import("@/lib/db");
+  return prisma;
+}
 
 /**
  * Run The Archivist on a single piece
