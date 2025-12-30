@@ -1,6 +1,10 @@
-import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { format } from "date-fns";
+
+async function getPrisma() {
+  const { prisma } = await import("@/lib/db");
+  return prisma;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +13,7 @@ export default async function LibraryPage({
 }: {
   searchParams: { lane?: string; status?: string; quality?: string };
 }) {
+  const prisma = await getPrisma();
   const { lane, status, quality } = searchParams;
 
   const pieces = await prisma.piece.findMany({

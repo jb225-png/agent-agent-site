@@ -1,7 +1,11 @@
-import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
+
+async function getPrisma() {
+  const { prisma } = await import("@/lib/db");
+  return prisma;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +14,7 @@ export default async function PieceDetailPage({
 }: {
   params: { id: string };
 }) {
+  const prisma = await getPrisma();
   const piece = await prisma.piece.findUnique({
     where: { id: params.id },
     include: {

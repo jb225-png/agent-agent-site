@@ -1,11 +1,16 @@
-import { prisma } from "@/lib/db";
 import { runAgent } from "@/lib/llm";
 import { startOfWeek } from "date-fns";
+
+async function getPrisma() {
+  const { prisma } = await import("@/lib/db");
+  return prisma;
+}
 
 /**
  * Run The Archivist on a single piece
  */
 export async function runArchivistOnPiece(pieceId: string) {
+  const prisma = await getPrisma();
   const piece = await prisma.piece.findUnique({
     where: { id: pieceId },
   });
@@ -45,6 +50,7 @@ export async function runArchivistOnPiece(pieceId: string) {
  * Run The Placement Agent on a single piece
  */
 export async function runPlacementOnPiece(pieceId: string) {
+  const prisma = await getPrisma();
   const piece = await prisma.piece.findUnique({
     where: { id: pieceId },
   });
@@ -82,6 +88,7 @@ export async function runPlacementOnPiece(pieceId: string) {
  * Run The Repurposer on a single piece
  */
 export async function runRepurposerOnPiece(pieceId: string) {
+  const prisma = await getPrisma();
   const piece = await prisma.piece.findUnique({
     where: { id: pieceId },
     include: { placement: true },
@@ -123,6 +130,7 @@ export async function runRepurposerOnPiece(pieceId: string) {
  * Run The Compiler on all pieces
  */
 export async function runCompiler() {
+  const prisma = await getPrisma();
   const pieces = await prisma.piece.findMany({
     include: {
       archivistTags: true,
@@ -157,6 +165,7 @@ export async function runCompiler() {
  * Run The Executive to create weekly queue
  */
 export async function runExecutive() {
+  const prisma = await getPrisma();
   const pieces = await prisma.piece.findMany({
     include: {
       archivistTags: true,
@@ -215,6 +224,7 @@ export async function runPipelineOnPiece(pieceId: string) {
  * Run entire pipeline on all pieces
  */
 export async function runPipelineOnAll() {
+  const prisma = await getPrisma();
   console.log("Running pipeline on all pieces...");
 
   const pieces = await prisma.piece.findMany();

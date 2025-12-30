@@ -1,8 +1,12 @@
-import { prisma } from "@/lib/db";
 import mammoth from "mammoth";
 // @ts-ignore
 import pdfParse from "pdf-parse";
 import JSZip from "jszip";
+
+async function getPrisma() {
+  const { prisma } = await import("@/lib/db");
+  return prisma;
+}
 
 interface IngestResult {
   pieceId: string;
@@ -42,6 +46,7 @@ export async function ingestText(
   content: string,
   source: string
 ): Promise<IngestResult> {
+  const prisma = await getPrisma();
   const title = extractTitle(source, content);
   const wordCount = countWords(content);
 
@@ -100,6 +105,7 @@ export async function ingestPdf(
     return ingestText(content, filename);
   } catch (error: any) {
     // Mark as needs manual review
+    const prisma = await getPrisma();
     const piece = await prisma.piece.create({
       data: {
         title: filename,
