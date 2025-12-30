@@ -1,105 +1,122 @@
 # Deploying Agent-Agent Writers Edition to Vercel
 
-## ⚠️ IMPORTANT: Root Directory Configuration
+## Quick Deploy
 
-The Next.js app is located in the `writers-app/` subdirectory.
+The repository is pre-configured with `vercel.json` and a root `package.json` that automatically handle the subdirectory setup. Just push and deploy!
 
-**You MUST configure the Root Directory in Vercel:**
+## Environment Variables Required
 
-1. Go to your Vercel project: https://vercel.com/dashboard
-2. Select your project
-3. Click **Settings** (top navigation)
-4. Click **General** (left sidebar)
-5. Scroll to **Root Directory**
-6. Click **Edit**
-7. Enter: `writers-app`
-8. Click **Save**
-9. Go to **Deployments** and click **Redeploy**
+In Vercel project settings (**Settings** → **Environment Variables**), add:
 
-Without this setting, Vercel will look for the app at the repository root and fail with:
-```
-Error: No Output Directory named "public" found
-```
-
-## Environment Variables
-
-After setting the Root Directory, configure environment variables:
-
-**Settings** → **Environment Variables** → **Add New**
-
-### Required Variables
-
+### Required
 ```bash
 DATABASE_URL=file:./dev.db
 LLM_MODE=mock
 ```
 
-### Optional (for real LLM mode)
-
+### Optional (for real OpenAI integration)
 ```bash
 LLM_MODE=openai
-OPENAI_API_KEY=sk-...your-key...
+OPENAI_API_KEY=sk-your-key-here
 ```
 
-## Vercel Auto-Detection
+## How It Works
 
-Once Root Directory is set to `writers-app`, Vercel will auto-detect:
+The Next.js app is in `writers-app/` subdirectory. The build is configured via:
 
-- **Framework**: Next.js
-- **Build Command**: `npm run build`
-- **Output Directory**: `.next`
-- **Install Command**: `npm install`
+- **`vercel.json`** - Specifies build commands and output directory
+  ```json
+  {
+    "buildCommand": "cd writers-app && npx prisma generate && npm run build",
+    "outputDirectory": "writers-app/.next",
+    "installCommand": "cd writers-app && npm install"
+  }
+  ```
 
-These settings are handled automatically by Vercel's Next.js integration.
+- **`package.json`** (root) - Delegates scripts to subdirectory for local dev consistency
 
-## Database Note
+Vercel automatically detects these and builds correctly.
 
-SQLite (`file:./dev.db`) works for development but is ephemeral on Vercel (resets on each deployment).
+## Build Process
 
-For production, consider:
-- Vercel Postgres
-- PlanetScale
-- Supabase
-- Railway Postgres
+When you push to GitHub, Vercel will:
 
-Update the `prisma/schema.prisma` datasource and `DATABASE_URL` accordingly.
+1. Run `cd writers-app && npm install`
+2. Run `cd writers-app && npx prisma generate` (creates Prisma client)
+3. Run `cd writers-app && npm run build` (builds Next.js)
+4. Serve from `writers-app/.next` output directory
 
-## Prisma Generation
+## Database Considerations
 
-The build process automatically runs `npx prisma generate` via Next.js's build script. No additional configuration needed.
+⚠️ **SQLite is ephemeral on Vercel** - the database resets with each deployment.
+
+For production persistence, migrate to a hosted database:
+- **Vercel Postgres** (recommended, easy integration)
+- **PlanetScale** (MySQL)
+- **Supabase** (PostgreSQL)
+- **Railway** (PostgreSQL)
+
+To migrate:
+1. Update `prisma/schema.prisma` datasource to PostgreSQL/MySQL
+2. Update `DATABASE_URL` environment variable in Vercel
+3. Run `npx prisma db push` to create tables
+4. Redeploy
 
 ## Deployment Checklist
 
-- [ ] Set Root Directory to `writers-app`
+- [ ] Push code to GitHub
+- [ ] Connect repository to Vercel (if not already)
 - [ ] Add `DATABASE_URL` environment variable
 - [ ] Add `LLM_MODE` environment variable
-- [ ] (Optional) Add `OPENAI_API_KEY` if using real LLM mode
-- [ ] Redeploy from Deployments tab
-- [ ] Verify build succeeds
+- [ ] (Optional) Add `OPENAI_API_KEY` for real LLM mode
+- [ ] Deploy
 - [ ] Test upload functionality
 - [ ] Test pipeline execution
 
 ## Troubleshooting
 
-### Build fails with Prisma errors
-→ Verify `DATABASE_URL` is set in environment variables
-
-### "No Output Directory named 'public' found"
-→ Root Directory is not set. Follow steps above.
-
-### Pages return 404 after deployment
-→ Check that Root Directory is exactly `writers-app` (no trailing slash)
+### Build fails with "Cannot find module '@prisma/client'"
+→ This is fixed - Prisma is generated in build command
 
 ### Environment variables not working
-→ Redeploy after adding variables (existing deployments don't auto-update)
+→ Redeploy after adding variables (doesn't auto-apply to existing deployments)
 
-## Alternative: Deploy from Subdirectory
+### Pages return 500 errors
+→ Check Vercel logs (Deployments → select deployment → Runtime Logs)
+→ Verify `DATABASE_URL` is set correctly
 
-If you prefer not to change Root Directory, you can:
+### Uploaded pieces disappear after deployment
+→ Expected with SQLite - migrate to hosted database for persistence
 
-1. Move `writers-app/` contents to repository root
-2. Delete the `writers-app/` folder
-3. Push changes
-4. Vercel will auto-detect Next.js at root
+## Local Development
 
-But the Root Directory approach is cleaner for monorepo setups.
+```bash
+cd writers-app
+npm install
+npx prisma generate
+npx prisma db push
+npm run dev
+```
+
+Open http://localhost:3000
+
+## Alternative: Move to Root
+
+If you prefer to simplify, you can move everything to the repository root:
+
+```bash
+# Move writers-app contents to root
+mv writers-app/* .
+mv writers-app/.* . 2>/dev/null
+rm -rf writers-app
+
+# Delete monorepo config files
+rm package.json vercel.json
+
+# Push changes
+git add -A
+git commit -m "Move Next.js app to repository root"
+git push
+```
+
+Vercel will auto-detect Next.js at root and deploy normally.

@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd writers-app && npx prisma generate && npm run build",
+  "outputDirectory": "writers-app/.next",
+  "installCommand": "cd writers-app && npm install"
+}

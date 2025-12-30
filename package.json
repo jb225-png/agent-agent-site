@@ -1,0 +1,11 @@
+{
+  "name": "agent-agent-site",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install": "cd writers-app && npm install",
+    "build": "cd writers-app && npm run build",
+    "dev": "cd writers-app && npm run dev",
+    "start": "cd writers-app && npm start"
+  }
+}
