@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runPipelineOnPiece } from "@/services/agents";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(
   request: NextRequest,
@@ -7,14 +9,15 @@ export async function POST(
 ) {
   try {
     const { pieceId } = params;
-    const result = await runPipelineOnPiece(pieceId);
 
-    return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("Pipeline error:", error);
-    return NextResponse.json(
-      { error: error.message || "Pipeline failed" },
-      { status: 500 }
-    );
+    // Import the pipeline ONLY when the endpoint is called
+    const { runPipelineOnPiece } = await import("@/services/agents");
+
+    await runPipelineOnPiece(pieceId);
+
+    return NextResponse.json({ success: true });
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || "Failed" }, { status: 500 });
   }
 }
+

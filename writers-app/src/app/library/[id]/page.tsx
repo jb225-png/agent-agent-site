@@ -1,23 +1,28 @@
-import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export default async function PieceDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const piece = await prisma.piece.findUnique({
-    where: { id: params.id },
+async function getPiece(id: string) {
+  const { prisma } = await import("@/lib/db");
+  return prisma.piece.findUnique({
+    where: { id },
     include: {
       archivistTags: true,
       placement: true,
       repurposeOutputs: true,
     },
   });
+}
+
+export default async function PieceDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const piece = await getPiece(params.id);
 
   if (!piece) {
     notFound();
@@ -29,9 +34,7 @@ export default async function PieceDetailPage({
   const voiceTags = piece.archivistTags
     ? JSON.parse(piece.archivistTags.voiceTagsJson)
     : [];
-  const outlets = piece.placement
-    ? JSON.parse(piece.placement.outletsJson)
-    : [];
+  const outlets = piece.placement ? JSON.parse(piece.placement.outletsJson) : [];
   const secondaryUses = piece.placement
     ? JSON.parse(piece.placement.secondaryJson)
     : [];
@@ -107,7 +110,9 @@ export default async function PieceDetailPage({
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold mb-1">Primary Lane</h3>
-                <p className="text-xl font-bold">{piece.placement.primaryLane}</p>
+                <p className="text-xl font-bold">
+                  {piece.placement.primaryLane}
+                </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Recommended Action</h3>
