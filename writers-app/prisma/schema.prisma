@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Piece {
+  id              String   @id @default(cuid())
+  title           String
+  body            String
+  source          String // file name or "paste"
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  wordCount       Int
+  rawMetadataJson String   @default("{}") // Additional metadata as JSON
+
+  // Relations
+  archivistTags   ArchivistTags?
+  placement       Placement?
+  repurposeOutputs RepurposeOutput[]
+
+  @@index([createdAt])
+}
+
+model ArchivistTags {
+  id              String   @id @default(cuid())
+  pieceId         String   @unique
+  themesJson      String   // list[str] stored as JSON
+  voiceTagsJson   String   // list[str] stored as JSON
+  status          String   // FINISHED, NEEDS_POLISH, FRAGMENT, SEED, ARCHIVE
+  qualityBand     String   // A, B, C
+  notes           String   // <=120 words
+  lineageJson     String   @default("{}") // {belongs_to_piece_id, rationale}
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  piece           Piece    @relation(fields: [pieceId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([qualityBand])
+}
+
+model Placement {
+  id                    String   @id @default(cuid())
+  pieceId               String   @unique
+  primaryLane           String   // SUBMISSION, PLATFORM, PRODUCT, ARCHIVE
+  secondaryJson         String   @default("[]") // list of secondary allowed uses
+  exclusivity           String   // SAFE_TO_PUBLISH, HOLD_FOR_SUBMISSION, LIMITED_EXCERPTS_ONLY
+  recommendedNextAction String   // SUBMIT_NOW, POLISH_1_2_HOURS, etc.
+  outletsJson           String   @default("[]") // 1-3 target outlets
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  piece                 Piece    @relation(fields: [pieceId], references: [id], onDelete: Cascade)
+
+  @@index([primaryLane])
+  @@index([exclusivity])
+}
+
+model RepurposeOutput {
+  id        String   @id @default(cuid())
+  pieceId   String
+  format    String   // THREAD, NEWSLETTER, PODCAST_MONOLOGUE, etc.
+  content   String
+  createdAt DateTime @default(now())
+
+  piece     Piece    @relation(fields: [pieceId], references: [id], onDelete: Cascade)
+
+  @@index([pieceId])
+  @@index([format])
+}
+
+model Collection {
+  id                      String   @id @default(cuid())
+  titleWorking            String
+  positioning             String   // 1 sentence
+  includedPieceIdsJson    String   // ordered list of piece IDs
+  missingJson             String   // list of what to write (intro, transitions, etc.)
+  estimatedEffortHours    Float
+  recommendedPriceBand    String   // LOW, MID, HIGH
+  launchReadiness         String   // READY, NEEDS_ASSEMBLY, NEEDS_NEW_WRITING
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@index([launchReadiness])
+}
+
+model WeeklyQueue {
+  id              String   @id @default(cuid())
+  weekStartDate   DateTime
+  tasksJson       String   // Array of tasks with type, piece_id(s), why_now, checklist, time_estimate
+  doNotTouchJson  String   @default("[]") // Protected pieces list
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([weekStartDate])
+}

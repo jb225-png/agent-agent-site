@@ -1,0 +1,98 @@
+[
+  {
+    "name": "The Paris Review",
+    "category": "literary",
+    "pays": true,
+    "typical_length_range": [2000, 8000],
+    "themes": ["literary fiction", "poetry", "essays", "interviews"],
+    "url": "https://www.theparisreview.org"
+  },
+  {
+    "name": "Granta",
+    "category": "literary",
+    "pays": true,
+    "typical_length_range": [3000, 10000],
+    "themes": ["literary fiction", "memoir", "reportage", "photography"],
+    "url": "https://granta.com"
+  },
+  {
+    "name": "The New Yorker",
+    "category": "magazine",
+    "pays": true,
+    "typical_length_range": [1500, 6000],
+    "themes": ["cultural commentary", "essays", "fiction", "humor"],
+    "url": "https://www.newyorker.com"
+  },
+  {
+    "name": "Electric Literature",
+    "category": "online",
+    "pays": true,
+    "typical_length_range": [1000, 5000],
+    "themes": ["contemporary fiction", "essays", "interviews", "craft"],
+    "url": "https://electricliterature.com"
+  },
+  {
+    "name": "Catapult",
+    "category": "online",
+    "pays": true,
+    "typical_length_range": [1500, 4000],
+    "themes": ["personal essays", "craft", "culture", "identity"],
+    "url": "https://catapult.co"
+  },
+  {
+    "name": "The Rumpus",
+    "category": "online",
+    "pays": true,
+    "typical_length_range": [1500, 4000],
+    "themes": ["essays", "interviews", "reviews", "poetry"],
+    "url": "https://therumpus.net"
+  },
+  {
+    "name": "Guernica",
+    "category": "magazine",
+    "pays": true,
+    "typical_length_range": [2000, 6000],
+    "themes": ["art", "politics", "global affairs", "photography"],
+    "url": "https://www.guernicamag.com"
+  },
+  {
+    "name": "The Believer",
+    "category": "literary",
+    "pays": true,
+    "typical_length_range": [2000, 8000],
+    "themes": ["essays", "interviews", "reviews", "art"],
+    "url": "https://thebeliever.net"
+  },
+  {
+    "name": "n+1",
+    "category": "magazine",
+    "pays": true,
+    "typical_length_range": [3000, 10000],
+    "themes": ["politics", "literature", "culture", "economics"],
+    "url": "https://www.nplusonemag.com"
+  },
+  {
+    "name": "LitHub",
+    "category": "online",
+    "pays": true,
+    "typical_length_range": [800, 2500],
+    "themes": ["book culture", "essays", "excerpts", "lists"],
+    "url": "https://lithub.com"
+  },
+  {
+    "name": "Longreads",
+    "category": "online",
+    "pays": true,
+    "typical_length_range": [2000, 10000],
+    "themes": ["narrative journalism", "essays", "features", "profiles"],
+    "url": "https://longreads.com"
+  },
+  {
+    "name": "McSweeney's",
+    "category": "literary",
+    "pays": true,
+    "typical_length_range": [500, 3000],
+    "themes": ["humor", "satire", "experimental", "quirky"],
+    "url": "https://www.mcsweeneys.net"
+  }
+]
