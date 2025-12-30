@@ -3,19 +3,20 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model Piece {
   id              String   @id @default(cuid())
   title           String
-  body            String
+  body            String   @db.Text
   source          String // file name or "paste"
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   wordCount       Int
-  rawMetadataJson String   @default("{}") // Additional metadata as JSON
+  rawMetadataJson String   @default("{}")
 
   // Relations
   archivistTags   ArchivistTags?
@@ -28,12 +29,12 @@ model Piece {
 model ArchivistTags {
   id              String   @id @default(cuid())
   pieceId         String   @unique
-  themesJson      String   // list[str] stored as JSON
-  voiceTagsJson   String   // list[str] stored as JSON
-  status          String   // FINISHED, NEEDS_POLISH, FRAGMENT, SEED, ARCHIVE
-  qualityBand     String   // A, B, C
-  notes           String   // <=120 words
-  lineageJson     String   @default("{}") // {belongs_to_piece_id, rationale}
+  themesJson      String   @db.Text
+  voiceTagsJson   String   @db.Text
+  status          String
+  qualityBand     String
+  notes           String   @db.Text
+  lineageJson     String   @default("{}")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -46,11 +47,11 @@ model ArchivistTags {
 model Placement {
   id                    String   @id @default(cuid())
   pieceId               String   @unique
-  primaryLane           String   // SUBMISSION, PLATFORM, PRODUCT, ARCHIVE
-  secondaryJson         String   @default("[]") // list of secondary allowed uses
-  exclusivity           String   // SAFE_TO_PUBLISH, HOLD_FOR_SUBMISSION, LIMITED_EXCERPTS_ONLY
-  recommendedNextAction String   // SUBMIT_NOW, POLISH_1_2_HOURS, etc.
-  outletsJson           String   @default("[]") // 1-3 target outlets
+  primaryLane           String
+  secondaryJson         String   @default("[]")
+  exclusivity           String
+  recommendedNextAction String
+  outletsJson           String   @default("[]")
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
@@ -63,8 +64,8 @@ model Placement {
 model RepurposeOutput {
   id        String   @id @default(cuid())
   pieceId   String
-  format    String   // THREAD, NEWSLETTER, PODCAST_MONOLOGUE, etc.
-  content   String
+  format    String
+  content   String   @db.Text
   createdAt DateTime @default(now())
 
   piece     Piece    @relation(fields: [pieceId], references: [id], onDelete: Cascade)
@@ -76,12 +77,12 @@ model RepurposeOutput {
 model Collection {
   id                      String   @id @default(cuid())
   titleWorking            String
-  positioning             String   // 1 sentence
-  includedPieceIdsJson    String   // ordered list of piece IDs
-  missingJson             String   // list of what to write (intro, transitions, etc.)
+  positioning             String   @db.Text
+  includedPieceIdsJson    String   @db.Text
+  missingJson             String   @db.Text
   estimatedEffortHours    Float
-  recommendedPriceBand    String   // LOW, MID, HIGH
-  launchReadiness         String   // READY, NEEDS_ASSEMBLY, NEEDS_NEW_WRITING
+  recommendedPriceBand    String
+  launchReadiness         String
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 
@@ -91,8 +92,8 @@ model Collection {
 model WeeklyQueue {
   id              String   @id @default(cuid())
   weekStartDate   DateTime
-  tasksJson       String   // Array of tasks with type, piece_id(s), why_now, checklist, time_estimate
-  doNotTouchJson  String   @default("[]") // Protected pieces list
+  tasksJson       String   @db.Text
+  doNotTouchJson  String   @default("[]")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
