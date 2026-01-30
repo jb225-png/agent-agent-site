@@ -12,10 +12,10 @@ export const dynamic = "force-dynamic";
 export default async function LibraryPage({
   searchParams,
 }: {
-  searchParams: { lane?: string; status?: string; quality?: string };
+  searchParams: { platform?: string; status?: string; quality?: string };
 }) {
   const prisma = await getPrisma();
-  const { lane, status, quality } = searchParams;
+  const { platform, status, quality } = searchParams;
 
   const pieces = await prisma.piece.findMany({
     include: {
@@ -26,7 +26,7 @@ export default async function LibraryPage({
   });
 
   const filtered = pieces.filter((piece) => {
-    if (lane && piece.placement?.primaryLane !== lane) return false;
+    if (platform && piece.placement?.primaryPlatform !== platform) return false;
     if (status && piece.archivistTags?.status !== status) return false;
     if (quality && piece.archivistTags?.qualityBand !== quality) return false;
     return true;
@@ -36,7 +36,7 @@ export default async function LibraryPage({
     <div className="max-w-7xl mx-auto px-6 py-12">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-4xl font-bold mb-2">Library</h1>
+          <h1 className="text-4xl font-bold mb-2">Content Library</h1>
           <p className="text-gray-600">
             {filtered.length} piece{filtered.length !== 1 ? "s" : ""}
           </p>
@@ -69,8 +69,8 @@ export default async function LibraryPage({
                 <th className="text-left p-4 font-bold">Words</th>
                 <th className="text-left p-4 font-bold">Quality</th>
                 <th className="text-left p-4 font-bold">Status</th>
-                <th className="text-left p-4 font-bold">Lane</th>
-                <th className="text-left p-4 font-bold">Next Action</th>
+                <th className="text-left p-4 font-bold">Platform</th>
+                <th className="text-left p-4 font-bold">Potential</th>
                 <th className="text-left p-4 font-bold">Date</th>
               </tr>
             </thead>
@@ -93,10 +93,10 @@ export default async function LibraryPage({
                     {piece.archivistTags?.status || "—"}
                   </td>
                   <td className="p-4 text-sm">
-                    {piece.placement?.primaryLane || "—"}
+                    {piece.placement?.primaryPlatform || "—"}
                   </td>
                   <td className="p-4 text-sm">
-                    {piece.placement?.recommendedNextAction || "—"}
+                    {piece.placement?.contentPotential || "—"}
                   </td>
                   <td className="p-4 text-sm text-gray-600">
                     {format(new Date(piece.createdAt), "MMM d")}

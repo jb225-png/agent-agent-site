@@ -6,7 +6,7 @@ export default function LibraryFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const lane = searchParams.get("lane") || "";
+  const platform = searchParams.get("platform") || "";
   const status = searchParams.get("status") || "";
   const quality = searchParams.get("quality") || "";
 
@@ -25,16 +25,19 @@ export default function LibraryFilters() {
       <h3 className="font-bold mb-4">Filters</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-semibold mb-2">Lane</label>
+          <label className="block text-sm font-semibold mb-2">Platform</label>
           <select
             className="w-full border border-black px-3 py-2"
-            value={lane}
-            onChange={(e) => updateFilter("lane", e.target.value)}
+            value={platform}
+            onChange={(e) => updateFilter("platform", e.target.value)}
           >
             <option value="">All</option>
-            <option value="SUBMISSION">Submission</option>
-            <option value="PLATFORM">Platform</option>
-            <option value="PRODUCT">Product</option>
+            <option value="LINKEDIN">LinkedIn</option>
+            <option value="TWITTER">Twitter</option>
+            <option value="INSTAGRAM">Instagram</option>
+            <option value="EMAIL">Email</option>
+            <option value="BLOG">Blog</option>
+            <option value="YOUTUBE">YouTube</option>
             <option value="ARCHIVE">Archive</option>
           </select>
         </div>
@@ -47,10 +50,9 @@ export default function LibraryFilters() {
             onChange={(e) => updateFilter("status", e.target.value)}
           >
             <option value="">All</option>
-            <option value="FINISHED">Finished</option>
-            <option value="NEEDS_POLISH">Needs Polish</option>
-            <option value="FRAGMENT">Fragment</option>
-            <option value="SEED">Seed</option>
+            <option value="READY">Ready</option>
+            <option value="NEEDS_CLEANUP">Needs Cleanup</option>
+            <option value="RAW">Raw</option>
             <option value="ARCHIVE">Archive</option>
           </select>
         </div>

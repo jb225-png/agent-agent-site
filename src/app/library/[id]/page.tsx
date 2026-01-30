@@ -35,11 +35,14 @@ export default async function PieceDetailPage({
   const voiceTags = piece.archivistTags
     ? JSON.parse(piece.archivistTags.voiceTagsJson)
     : [];
-  const outlets = piece.placement
-    ? JSON.parse(piece.placement.outletsJson)
+  const keyInsights = piece.archivistTags
+    ? JSON.parse(piece.archivistTags.keyInsightsJson || "[]")
     : [];
-  const secondaryUses = piece.placement
-    ? JSON.parse(piece.placement.secondaryJson)
+  const secondaryPlatforms = piece.placement
+    ? JSON.parse(piece.placement.secondaryPlatformsJson || "[]")
+    : [];
+  const recommendedFormats = piece.placement
+    ? JSON.parse(piece.placement.recommendedFormatsJson || "[]")
     : [];
 
   return (
@@ -61,9 +64,9 @@ export default async function PieceDetailPage({
         <div className="mb-8 p-6 border border-black bg-gray-50">
           <p className="mb-4">This piece hasn&apos;t been analyzed yet. Run the agent pipeline to get:</p>
           <ul className="list-disc list-inside mb-4 text-sm space-y-1">
-            <li>Themes, voice tags, quality assessment (Archivist)</li>
-            <li>Placement decision and recommended action (Placement Agent)</li>
-            <li>Repurposed content for different platforms (Repurposer)</li>
+            <li>Themes, voice tags, key insights (Archivist)</li>
+            <li>Platform placement and content potential (Placement Agent)</li>
+            <li>LinkedIn posts, Twitter threads, email drafts (Repurposer)</li>
           </ul>
           <RunAgentsButton pieceId={piece.id} />
         </div>
@@ -81,15 +84,21 @@ export default async function PieceDetailPage({
           <div className="border border-black p-6">
             <h2 className="text-xl font-bold mb-4">The Archivist</h2>
             <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-1">Status</h3>
-                <p>{piece.archivistTags.status}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Quality Band</h3>
-                <p className="text-2xl font-bold">
-                  {piece.archivistTags.qualityBand}
-                </p>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <h3 className="font-semibold mb-1 text-sm">Status</h3>
+                  <p className="text-lg">{piece.archivistTags.status}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1 text-sm">Quality</h3>
+                  <p className="text-2xl font-bold">
+                    {piece.archivistTags.qualityBand}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1 text-sm">Type</h3>
+                  <p className="text-sm">{piece.archivistTags.contentType}</p>
+                </div>
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Themes</h3>
@@ -117,6 +126,16 @@ export default async function PieceDetailPage({
                   ))}
                 </div>
               </div>
+              {keyInsights.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-1">Key Insights</h3>
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    {keyInsights.map((insight: string, i: number) => (
+                      <li key={i}>{insight}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div>
                 <h3 className="font-semibold mb-1">Notes</h3>
                 <p className="text-sm">{piece.archivistTags.notes}</p>
@@ -130,38 +149,45 @@ export default async function PieceDetailPage({
           <div className="border border-black p-6">
             <h2 className="text-xl font-bold mb-4">The Placement Agent</h2>
             <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-1">Primary Lane</h3>
-                <p className="text-xl font-bold">{piece.placement.primaryLane}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Recommended Action</h3>
-                <p>{piece.placement.recommendedNextAction}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Exclusivity</h3>
-                <p className="text-sm">{piece.placement.exclusivity}</p>
-              </div>
-              {outlets.length > 0 && (
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="font-semibold mb-1">Target Outlets</h3>
+                  <h3 className="font-semibold mb-1 text-sm">Primary Platform</h3>
+                  <p className="text-xl font-bold">{piece.placement.primaryPlatform}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1 text-sm">Content Potential</h3>
+                  <p className="text-xl font-bold">{piece.placement.contentPotential}</p>
+                </div>
+              </div>
+              {secondaryPlatforms.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-1">Secondary Platforms</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {secondaryPlatforms.map((platform: string) => (
+                      <span
+                        key={platform}
+                        className="border border-gray-400 px-2 py-1 text-sm"
+                      >
+                        {platform}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {recommendedFormats.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-1">Recommended Formats</h3>
                   <ul className="list-disc list-inside text-sm">
-                    {outlets.map((outlet: string) => (
-                      <li key={outlet}>{outlet}</li>
+                    {recommendedFormats.map((format: string) => (
+                      <li key={format}>{format}</li>
                     ))}
                   </ul>
                 </div>
               )}
-              {secondaryUses.length > 0 && (
-                <div>
-                  <h3 className="font-semibold mb-1">Secondary Uses</h3>
-                  <ul className="list-disc list-inside text-sm">
-                    {secondaryUses.map((use: string) => (
-                      <li key={use}>{use}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <div>
+                <h3 className="font-semibold mb-1">Reasoning</h3>
+                <p className="text-sm">{piece.placement.reasoning}</p>
+              </div>
             </div>
           </div>
         )}
@@ -171,15 +197,79 @@ export default async function PieceDetailPage({
       {piece.repurposeOutputs.length > 0 && (
         <div className="mb-8 border border-black p-6">
           <h2 className="text-xl font-bold mb-4">The Repurposer</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            {piece.repurposeOutputs.length} pieces of content generated
+          </p>
           <div className="space-y-6">
-            {piece.repurposeOutputs.map((output) => (
-              <div key={output.id}>
-                <h3 className="font-semibold mb-2">{output.format}</h3>
-                <pre className="bg-gray-100 p-4 text-sm whitespace-pre-wrap border border-gray-300">
-                  {output.content}
-                </pre>
-              </div>
-            ))}
+            {piece.repurposeOutputs.map((output) => {
+              const content = JSON.parse(output.contentJson);
+              return (
+                <div key={output.id} className="border-t border-gray-200 pt-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-semibold">
+                      {output.platform} - {output.format}
+                    </h3>
+                    <span className="text-xs px-2 py-1 bg-gray-100">
+                      {output.status}
+                    </span>
+                  </div>
+                  {output.platform === "LINKEDIN" && (
+                    <div className="bg-gray-50 p-4 text-sm">
+                      <p className="font-bold mb-2">{content.hook}</p>
+                      <pre className="whitespace-pre-wrap">{content.body}</pre>
+                      {content.cta && (
+                        <p className="mt-2 text-gray-600">{content.cta}</p>
+                      )}
+                    </div>
+                  )}
+                  {output.platform === "TWITTER" && (
+                    <div className="bg-gray-50 p-4 text-sm space-y-2">
+                      {content.tweets?.map((tweet: any, i: number) => (
+                        <div key={i} className="border-l-2 border-blue-400 pl-3">
+                          <span className="text-xs text-gray-500">{tweet.position}/</span>
+                          <p>{tweet.text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {output.platform === "EMAIL" && (
+                    <div className="bg-gray-50 p-4 text-sm">
+                      <p className="font-bold">Subject: {content.subject_line}</p>
+                      <p className="text-gray-500 mb-2">Preview: {content.preview_text}</p>
+                      <pre className="whitespace-pre-wrap">{content.body}</pre>
+                    </div>
+                  )}
+                  {output.platform === "INSTAGRAM" && (
+                    <div className="bg-gray-50 p-4 text-sm">
+                      <pre className="whitespace-pre-wrap">{content.caption}</pre>
+                      {content.hashtags && (
+                        <p className="text-blue-600 mt-2">
+                          {content.hashtags.map((h: string) => `#${h}`).join(" ")}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {output.platform === "BLOG" && (
+                    <div className="bg-gray-50 p-4 text-sm">
+                      <p className="font-bold text-lg">{content.title}</p>
+                      <p className="text-gray-500 mb-2">{content.meta_description}</p>
+                      <div className="space-y-2">
+                        {content.sections?.map((section: any, i: number) => (
+                          <div key={i}>
+                            <p className="font-semibold">{section.heading}</p>
+                            <ul className="list-disc list-inside text-xs">
+                              {section.key_points?.map((point: string, j: number) => (
+                                <li key={j}>{point}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
