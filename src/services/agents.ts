@@ -383,7 +383,7 @@ export async function runExecutive(clientId?: string) {
       clientId: clientId || "default",
       // Store the entire output as JSON so we can access weekly_calendar, posting_schedule, etc.
       calendarJson: JSON.stringify(output),
-      weeklyBreakdownJson: JSON.stringify(output.calendar_summary || output.weekly_breakdown || {}),
+      weeklyBreakdownJson: JSON.stringify(output.calendar_summary || {}),
       strategyNotes: output.strategy_notes || "",
       contentGapsJson: JSON.stringify(output.content_gaps || []),
     },
