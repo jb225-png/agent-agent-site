@@ -248,130 +248,288 @@ function mockRepurposer(piece: any) {
 
 function mockExecutive(pieces: any[]) {
   const today = new Date();
-  const calendar = [];
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   
-  // Generate 30 days of content
-  for (let i = 0; i < 30; i++) {
-    const date = new Date(today);
-    date.setDate(date.getDate() + i);
-    const dateStr = date.toISOString().split('T')[0];
-    const dayOfWeek = date.getDay();
+  // Helper to format date
+  const formatDate = (date: Date) => {
+    return `${monthNames[date.getMonth()]} ${date.getDate()}`;
+  };
+
+  // Generate 4 weeks of content
+  const weeklyCalendar = [];
+  
+  for (let week = 1; week <= 4; week++) {
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() + (week - 1) * 7);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
     
-    // Skip weekends for LinkedIn, lighter posting
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-      // LinkedIn: Tue, Wed, Thu
-      if (dayOfWeek >= 2 && dayOfWeek <= 4) {
-        calendar.push({
+    const posts = [];
+    
+    // Generate posts for each day of the week
+    for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+      const postDate = new Date(weekStart);
+      postDate.setDate(weekStart.getDate() + dayOffset);
+      const dayOfWeek = postDate.getDay();
+      const dateStr = postDate.toISOString().split('T')[0];
+      const dayName = dayNames[dayOfWeek];
+      
+      // LinkedIn: Monday, Wednesday, Friday at 9:00 AM EST
+      if (dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 5) {
+        const linkedinFormats = ["Story Post", "Insight Post", "Listicle", "Question Post", "Hot Take"];
+        const contentDescriptions = [
+          "Share client transformation story - 'Last week, a client asked me...'",
+          "Contrarian take on common industry advice",
+          "5 things nobody tells you about [topic]",
+          "Engagement post: 'Quick audit for leaders...'",
+          "Personal lesson learned from coaching",
+        ];
+        const formatIndex = (week - 1 + dayOffset) % linkedinFormats.length;
+        
+        posts.push({
+          day: dayName,
           date: dateStr,
-          time: "08:00",
-          platform: "LINKEDIN",
-          content_type: "Story post",
-          piece_id: pieces[0]?.id,
-          notes: "Morning engagement window",
+          time: "9:00 AM EST",
+          platform: "LinkedIn",
+          content_type: linkedinFormats[formatIndex],
+          content_description: contentDescriptions[formatIndex],
+          source_piece_id: pieces[0]?.id,
+          content_index: formatIndex,
         });
       }
       
-      // Twitter: Daily on weekdays
-      calendar.push({
-        date: dateStr,
-        time: "12:00",
-        platform: "TWITTER",
-        content_type: i % 3 === 0 ? "Thread" : "Single tweet",
-        piece_id: pieces[0]?.id,
-        notes: "Lunch engagement peak",
-      });
+      // Twitter: Daily (weekdays) at 12:00 PM EST
+      if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        const isThread = dayOfWeek === 2 || dayOfWeek === 4; // Threads on Tue/Thu
+        posts.push({
+          day: dayName,
+          date: dateStr,
+          time: "12:00 PM EST",
+          platform: "Twitter/X",
+          content_type: isThread ? "Thread (5-8 tweets)" : "Single Tweet",
+          content_description: isThread 
+            ? "Repurpose LinkedIn insight into thread format"
+            : "Quick tip or insight from recent content",
+          source_piece_id: pieces[0]?.id,
+          content_index: dayOffset,
+        });
+      }
+      
+      // Email: Tuesday at 7:00 AM EST
+      if (dayOfWeek === 2) {
+        posts.push({
+          day: dayName,
+          date: dateStr,
+          time: "7:00 AM EST",
+          platform: "Email",
+          content_type: "Weekly Newsletter",
+          content_description: `Week ${week} newsletter - Expand on this week's LinkedIn story`,
+          source_piece_id: pieces[0]?.id,
+          content_index: 0,
+        });
+      }
+      
+      // Instagram: Wednesday, Saturday at 11:00 AM EST
+      if (dayOfWeek === 3 || dayOfWeek === 6) {
+        posts.push({
+          day: dayName,
+          date: dateStr,
+          time: "11:00 AM EST",
+          platform: "Instagram",
+          content_type: dayOfWeek === 3 ? "Carousel Post" : "Story + Reel",
+          content_description: dayOfWeek === 3 
+            ? "Educational carousel from LinkedIn content"
+            : "Behind-the-scenes or personal moment",
+          source_piece_id: pieces[0]?.id,
+          content_index: week - 1,
+        });
+      }
     }
     
-    // Email: Tuesday
-    if (dayOfWeek === 2 && i % 7 === 0) {
-      calendar.push({
-        date: dateStr,
-        time: "06:00",
-        platform: "EMAIL",
-        content_type: "Newsletter",
-        piece_id: pieces[0]?.id,
-        notes: "Weekly newsletter",
-      });
-    }
+    const weekFocuses = [
+      "Client Stories & Results",
+      "Contrarian Takes & Hot Takes", 
+      "Educational How-Tos",
+      "Personal Journey & Lessons"
+    ];
+    
+    weeklyCalendar.push({
+      week_number: week,
+      date_range: `${formatDate(weekStart)} - ${formatDate(weekEnd)}`,
+      posts: posts,
+      week_focus: weekFocuses[week - 1],
+    });
   }
 
   return {
-    calendar,
-    weekly_breakdown: {
-      linkedin_posts: 3,
-      twitter_posts: 5,
-      instagram_posts: 2,
-      emails: 1,
+    calendar_summary: {
+      total_posts: 52, // 3 LinkedIn + 5 Twitter + 1 Email + 2 Instagram per week × 4 weeks
+      linkedin_posts: 12,
+      twitter_posts: 20,
+      instagram_posts: 8,
+      emails: 4,
       blog_posts: 0,
     },
-    strategy_notes: "Focus on LinkedIn as primary platform for B2B coaching. Use Twitter for daily touchpoints and engagement. Email weekly to nurture existing audience. Instagram optional for behind-the-scenes content.",
+    weekly_calendar: weeklyCalendar,
+    posting_schedule: {
+      linkedin: "Monday, Wednesday, Friday at 9:00 AM EST",
+      twitter: "Monday-Friday at 12:00 PM EST (Threads on Tue/Thu)",
+      instagram: "Wednesday at 11:00 AM EST (Carousel), Saturday at 11:00 AM EST (Story/Reel)",
+      email: "Tuesday at 7:00 AM EST",
+    },
+    strategy_notes: "This 30-day calendar prioritizes LinkedIn for B2B lead generation. Twitter threads repurpose LinkedIn content for broader reach. Weekly email nurtures your list. Instagram builds personal brand with lower frequency. All content draws from your uploaded source material.",
     content_gaps: [
-      "Need more case study content for social proof",
-      "Missing video content for YouTube/Instagram Reels",
-      "Could use more personal story content",
+      "Need 2-3 more client success stories for social proof",
+      "Could use video content for Instagram Reels",
+      "Consider adding a monthly blog post for SEO",
     ],
   };
 }
 
 function mockStrategist(input: StrategistInput) {
+  // Determine if B2B or B2C based on niche
+  const isB2B = input.coaching_niche?.toLowerCase().includes("executive") ||
+                input.coaching_niche?.toLowerCase().includes("leadership") ||
+                input.coaching_niche?.toLowerCase().includes("business") ||
+                input.target_audience?.toLowerCase().includes("ceo") ||
+                input.target_audience?.toLowerCase().includes("executive");
+
   return {
-    platform_priority: [
+    platform_recommendations: [
       {
         platform: "LinkedIn",
         priority: 1,
-        reasoning: "Primary platform for B2B coaching. Your niche aligns perfectly with LinkedIn's professional audience.",
-        weekly_target: "3-5 posts",
+        recommended: true,
+        weekly_frequency: "3x per week",
+        best_days: ["Monday", "Wednesday", "Friday"],
+        best_times: ["9:00 AM EST", "12:00 PM EST"],
+        reasoning: isB2B 
+          ? "Primary platform for B2B coaching. C-suite executives are most active here. Your niche aligns perfectly with LinkedIn's professional audience."
+          : "Strong platform for establishing credibility. Decision-makers research coaches here before buying.",
+        content_types: ["Story posts", "Carousels", "Insight posts", "Question posts", "Articles"],
       },
       {
         platform: "Email",
         priority: 2,
-        reasoning: "Owned audience with highest conversion rates. Build list from LinkedIn traffic.",
-        weekly_target: "1-2 newsletters",
+        recommended: true,
+        weekly_frequency: "1x per week",
+        best_days: ["Tuesday"],
+        best_times: ["7:00 AM EST", "10:00 AM EST"],
+        reasoning: "Your only owned audience. Highest conversion rate of any channel. LinkedIn followers should become email subscribers.",
+        content_types: ["Weekly newsletter", "Nurture sequences", "Launch emails"],
       },
       {
         platform: "Twitter/X",
         priority: 3,
-        reasoning: "Good for reach and engagement. Repurpose LinkedIn content into threads.",
-        weekly_target: "5-7 posts",
+        recommended: true,
+        weekly_frequency: "5x per week (daily on weekdays)",
+        best_days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        best_times: ["12:00 PM EST", "5:00 PM EST"],
+        reasoning: "Excellent for building authority and network. Threads perform well. Repurpose LinkedIn content into bite-sized insights.",
+        content_types: ["Threads", "Single tweets", "Quote tweets", "Replies"],
+      },
+      {
+        platform: "Instagram",
+        priority: 4,
+        recommended: input.target_audience?.toLowerCase().includes("entrepreneur") || !isB2B,
+        weekly_frequency: "2-3x per week",
+        best_days: ["Wednesday", "Saturday", "Sunday"],
+        best_times: ["11:00 AM EST", "7:00 PM EST"],
+        reasoning: isB2B 
+          ? "Lower priority for B2B but useful for personal brand building and behind-the-scenes content."
+          : "Strong platform for lifestyle coaches. Visual content performs well. Good for building personal connection.",
+        content_types: ["Carousels", "Reels", "Stories", "Static posts"],
+      },
+      {
+        platform: "YouTube",
+        priority: 5,
+        recommended: false,
+        weekly_frequency: "1x per week (if resources allow)",
+        best_days: ["Tuesday", "Thursday"],
+        best_times: ["12:00 PM EST"],
+        reasoning: "High effort but excellent for long-term SEO and credibility. Consider starting once other platforms are consistent.",
+        content_types: ["Long-form videos", "Shorts", "Podcast clips"],
       },
     ],
+    recommended_schedule: {
+      summary: "Post LinkedIn 3x/week (Mon/Wed/Fri), Twitter daily, Email weekly (Tuesday), Instagram 2x/week",
+      weekly_time_investment: "4-6 hours/week (with batching)",
+      linkedin: {
+        frequency: "3 posts per week",
+        days: ["Monday", "Wednesday", "Friday"],
+        times: ["9:00 AM EST"],
+        content_mix: "1 story post, 1 insight/hot take, 1 educational carousel or listicle",
+      },
+      twitter: {
+        frequency: "5 posts per week (weekdays)",
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        times: ["12:00 PM EST"],
+        content_mix: "2 threads (Tue/Thu), 3 single tweets repurposed from LinkedIn",
+      },
+      instagram: {
+        frequency: "2 posts per week",
+        days: ["Wednesday", "Saturday"],
+        times: ["11:00 AM EST"],
+        content_mix: "1 educational carousel, 1 behind-the-scenes or personal post",
+      },
+      email: {
+        frequency: "1 newsletter per week",
+        days: ["Tuesday"],
+        times: ["7:00 AM EST"],
+        content_mix: "Expand on best-performing LinkedIn post from previous week + CTA",
+      },
+    },
     content_strategy: {
-      primary_content_type: "Thought leadership posts with actionable insights",
+      primary_content_type: "Thought leadership posts with actionable frameworks and client stories",
       content_pillars: [
-        "Client transformation stories",
-        "Contrarian industry takes",
-        "Tactical how-tos",
-        "Personal journey/lessons learned",
+        "Client transformation stories (social proof)",
+        "Contrarian industry takes (thought leadership)",
+        "Tactical how-tos (value delivery)",
+        "Personal journey & lessons (relatability)",
+        "Quick wins & frameworks (shareability)",
       ],
-      posting_cadence: "LinkedIn 3x/week (Tue-Thu 8am), Twitter daily, Email weekly (Tuesday 6am)",
-      engagement_strategy: "Spend 15-20 min after each LinkedIn post engaging with comments. Comment on 5-10 posts from ideal clients daily. Build relationships before pitching.",
+      posting_cadence: "LinkedIn 3x/week (Mon/Wed/Fri 9am EST), Twitter 5x/week (12pm EST), Email Tuesdays (7am EST), Instagram 2x/week",
+      engagement_strategy: "Spend 15-20 min after each LinkedIn post responding to comments. Comment on 5-10 posts from ideal clients daily. Use Twitter for networking and conversations. Build relationships before pitching.",
     },
     quick_wins: [
       {
-        action: "Turn your best podcast episode into a LinkedIn carousel + Twitter thread",
+        action: "Turn your best podcast episode into 5 LinkedIn posts + 2 Twitter threads + 1 email",
         impact: "high",
         effort: "low",
         timeframe: "This week",
       },
       {
-        action: "Add a clear CTA to your LinkedIn headline",
-        impact: "medium",
+        action: "Update LinkedIn headline with clear outcome: 'I help [audience] achieve [result]'",
+        impact: "high",
         effort: "low",
         timeframe: "Today",
       },
       {
-        action: "Set up a simple lead magnet from existing content",
+        action: "Create a simple lead magnet PDF from your best content",
         impact: "high",
         effort: "medium",
         timeframe: "Next 2 weeks",
       },
+      {
+        action: "Set up a content calendar in Notion or Airtable",
+        impact: "medium",
+        effort: "low",
+        timeframe: "This week",
+      },
+      {
+        action: "Block 2 hours every Monday for content batching",
+        impact: "high",
+        effort: "low",
+        timeframe: "Starting next Monday",
+      },
     ],
     recommendations: [
-      "Your podcast is an untapped goldmine. One episode should generate 20+ pieces of content.",
-      "Focus on LinkedIn for 90 days before expanding to other platforms.",
-      "Build email list aggressively—it's the only audience you truly own.",
-      "Document client wins religiously. Social proof drives conversions.",
-      "Batch content creation: One 2-hour session can create a month of content.",
+      "Your existing content (podcast/workshops) is an untapped goldmine. One episode = 20+ pieces of content.",
+      "Focus on LinkedIn for 90 days before expanding significantly to other platforms.",
+      "Build email list aggressively—it's the only audience you truly own. Add lead magnet to LinkedIn.",
+      "Document every client win. Social proof drives conversions more than anything else.",
+      "Batch content creation: One 2-hour session can create a full month of content.",
     ],
   };
 }

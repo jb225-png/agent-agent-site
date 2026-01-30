@@ -145,34 +145,61 @@ export const CompilerOutputSchema = z.object({
 export type CompilerOutput = z.infer<typeof CompilerOutputSchema>;
 export type ContentSeries = z.infer<typeof ContentSeriesSchema>;
 
-// Executive Agent Schema (30-day calendar)
-export const CalendarEntrySchema = z.object({
+// Executive Agent Schema (ENHANCED 30-day calendar with weekly view)
+export const WeeklyCalendarEntrySchema = z.object({
+  day: z.string(), // "Monday", "Tuesday", etc.
   date: z.string(), // YYYY-MM-DD
-  time: z.string(), // HH:MM
-  platform: z.enum(["LINKEDIN", "TWITTER", "INSTAGRAM", "EMAIL", "BLOG"]),
-  content_type: z.string(),
-  piece_id: z.string().optional(), // Source piece if applicable
-  repurposed_content_index: z.number().optional(), // Which repurposed piece to use
-  notes: z.string().max(100).optional(),
+  time: z.string(), // "9:00 AM EST"
+  platform: z.string(),
+  content_type: z.string(), // "Story Post", "Thread", "Newsletter"
+  content_description: z.string().max(150), // Brief description of what to post
+  source_piece_id: z.string().optional(),
+  content_index: z.number().optional(), // Which LinkedIn post #, thread #, etc.
+});
+
+export const WeekSchema = z.object({
+  week_number: z.number(), // 1, 2, 3, 4
+  date_range: z.string(), // "Jan 27 - Feb 2"
+  posts: z.array(WeeklyCalendarEntrySchema),
+  week_focus: z.string().max(100), // "Leadership theme" or "Client stories week"
 });
 
 export const ExecutiveOutputSchema = z.object({
-  calendar: z.array(CalendarEntrySchema),
-  weekly_breakdown: z.object({
+  calendar_summary: z.object({
+    total_posts: z.number(),
     linkedin_posts: z.number(),
     twitter_posts: z.number(),
     instagram_posts: z.number(),
     emails: z.number(),
     blog_posts: z.number(),
   }),
+  weekly_calendar: z.array(WeekSchema),
+  posting_schedule: z.object({
+    linkedin: z.string(), // "Monday, Wednesday, Friday at 9:00 AM EST"
+    twitter: z.string(),
+    instagram: z.string(),
+    email: z.string(),
+  }),
   strategy_notes: z.string().max(500),
-  content_gaps: z.array(z.string()), // What content is missing for a full calendar
+  content_gaps: z.array(z.string()),
 });
 
 export type ExecutiveOutput = z.infer<typeof ExecutiveOutputSchema>;
-export type CalendarEntry = z.infer<typeof CalendarEntrySchema>;
+export type Week = z.infer<typeof WeekSchema>;
+export type WeeklyCalendarEntry = z.infer<typeof WeeklyCalendarEntrySchema>;
 
-// NEW: Strategist Agent Schema
+// ENHANCED Strategist Agent Schema
+export const PlatformRecommendationSchema = z.object({
+  platform: z.string(),
+  priority: z.number(), // 1 = highest
+  recommended: z.boolean(),
+  weekly_frequency: z.string(), // "3x per week"
+  best_days: z.array(z.string()), // ["Monday", "Wednesday", "Friday"]
+  best_times: z.array(z.string()), // ["9:00 AM EST", "12:00 PM EST"]
+  reasoning: z.string().max(200),
+  content_types: z.array(z.string()), // ["Story posts", "Carousels", "Articles"]
+});
+
 export const StrategistInputSchema = z.object({
   coaching_niche: z.string(),
   target_audience: z.string(),
@@ -205,12 +232,35 @@ export const StrategistInputSchema = z.object({
 });
 
 export const StrategistOutputSchema = z.object({
-  platform_priority: z.array(z.object({
-    platform: z.string(),
-    priority: z.number(), // 1 = highest
-    reasoning: z.string().max(200),
-    weekly_target: z.string(), // e.g., "3-5 posts"
-  })),
+  platform_recommendations: z.array(PlatformRecommendationSchema),
+  recommended_schedule: z.object({
+    summary: z.string(), // "Post LinkedIn 3x/week, Twitter daily, Email weekly"
+    weekly_time_investment: z.string(), // "4-6 hours/week"
+    linkedin: z.object({
+      frequency: z.string(),
+      days: z.array(z.string()),
+      times: z.array(z.string()),
+      content_mix: z.string(), // "2 story posts, 1 educational carousel"
+    }),
+    twitter: z.object({
+      frequency: z.string(),
+      days: z.array(z.string()),
+      times: z.array(z.string()),
+      content_mix: z.string(),
+    }),
+    instagram: z.object({
+      frequency: z.string(),
+      days: z.array(z.string()),
+      times: z.array(z.string()),
+      content_mix: z.string(),
+    }),
+    email: z.object({
+      frequency: z.string(),
+      days: z.array(z.string()),
+      times: z.array(z.string()),
+      content_mix: z.string(),
+    }),
+  }),
   content_strategy: z.object({
     primary_content_type: z.string(),
     content_pillars: z.array(z.string()).min(3).max(5),
@@ -228,3 +278,4 @@ export const StrategistOutputSchema = z.object({
 
 export type StrategistInput = z.infer<typeof StrategistInputSchema>;
 export type StrategistOutput = z.infer<typeof StrategistOutputSchema>;
+export type PlatformRecommendation = z.infer<typeof PlatformRecommendationSchema>;
