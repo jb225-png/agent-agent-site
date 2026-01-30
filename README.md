@@ -1,72 +1,103 @@
-# Agent-Agent: Writers Edition
+# Agent-Agent: Coaches Edition
 
-A cognitive agent system that turns a writer's existing catalog into clear organization, placement decisions, product compilation, and repurposing outputs — with an executive queue that tells you exactly what to do next.
+A cognitive agent system that transforms coaches' raw content (podcasts, workshops, voice memos, videos) into a complete content operation — organized, repurposed for every platform, and scheduled in a 30-day calendar.
 
-## Product Thesis
+## Business Context
 
-This is NOT a "talent agent." It does not hype, flatter, or "motivate." It cuts through the noise of your brain, organizes your catalog, and produces a clear path to making money.
+**Target Market:** Executive coaches making $500k-5M/year who:
+- Spend 10-15 hours/week on content and hate it
+- Have scattered content (podcasts, workshops, client calls) with no system
+- Currently pay $6,000-10,000/month for marketing managers
 
-The system makes DECISIONS, not endless suggestions.
+**The Offer:**
+- **Tier 1 ($2,500/month):** Strategy + 20-30 repurposed pieces monthly + 30-day calendar
+- **Tier 2 ($4,500/month):** Everything in Tier 1 + dedicated VA for hands-off posting
 
-## The 5 Agents
+## The 6 Agents
 
-### 1. The Archivist (Sorting Agent)
-**Goal:** Answer "What do I actually have?"
+### 1. The Archivist
+**Goal:** Analyze and categorize content pieces
 
 For each piece, outputs:
-- Themes (3-8)
-- Voice tags (e.g., "humor", "serious", "philosophical")
-- Status (FINISHED, NEEDS_POLISH, FRAGMENT, SEED, ARCHIVE)
-- Quality band (A/B/C: A = publish-ready, B = close, C = raw)
-- Notes (short, ≤120 words)
+- Themes (2-8)
+- Voice tags
+- Content type (PODCAST_TRANSCRIPT, VIDEO_TRANSCRIPT, VOICE_MEMO, etc.)
+- Status (READY, NEEDS_CLEANUP, RAW, ARCHIVE)
+- Quality band (A/B/C)
+- **Key insights** (extractable quotes and ideas)
+- Notes
 
 ### 2. The Placement Agent
-**Goal:** Decide destination, not value.
+**Goal:** Decide platform destinations
 
-Assigns exactly one primary lane:
-- SUBMISSION (literary magazines, contests)
-- PLATFORM (social media, newsletters)
-- PRODUCT (ebooks, compilations)
-- ARCHIVE (not ready)
+Assigns:
+- Primary platform (LinkedIn, Twitter, Instagram, Email, Blog, YouTube, Archive)
+- Secondary platforms
+- Content potential (HIGH/MEDIUM/LOW — how many pieces can be generated)
+- Recommended formats
+- Reasoning
 
-Plus recommended next action and target outlets.
+### 3. The Repurposer
+**Goal:** Transform content into platform-native pieces
 
-### 3. The Compiler (Product Agent)
-**Goal:** Build sellable units.
+Generates:
+- **5-7 LinkedIn posts** (story, listicle, insight, question, hot_take, case_study, how_to)
+- **3-5 Twitter threads** (3-15 tweets each)
+- **3-5 Instagram captions** (with carousel slide ideas)
+- **1-2 Email newsletter drafts**
+- **1 Blog post outline** (with SEO meta description)
 
-Creates "Collections" from clustered pieces (e.g., ebook candidates) with:
-- Working title and positioning
-- Included pieces (ordered)
-- Missing connective tissue (what to write)
-- Effort estimate and price band
-- Launch readiness
+Each piece feels native to its platform with scroll-stopping hooks.
 
-### 4. The Repurposer (Format Agent)
-**Goal:** Convert AFTER placement is decided.
+### 4. The Compiler
+**Goal:** Identify content series opportunities
 
-Rules:
-- NEVER repurposes pieces held for submission
-- For PLATFORM lane pieces, generates native-feeling outputs (threads read like threads, scripts sound spoken)
-- Recommends formats in priority order
-- Generates top 1-2 outputs only
+Creates:
+- Email sequences
+- Blog series
+- LinkedIn series
+- Lead magnets
+- Course modules
 
-### 5. The Executive (Queue Agent)
-**Goal:** Decide what you do next.
+Identifies what's missing to complete each series.
 
-Outputs a weekly queue with strict limits:
-- Max 3 submission tasks
-- Max 3 platform tasks
-- Max 1 product task
+### 5. The Executive
+**Goal:** Create a 30-day content calendar
 
-Each task includes: why_now (≤40 words), step-by-step checklist, time estimate.
+Outputs:
+- Full calendar with dates, times, platforms, content types
+- Weekly breakdown (posts per platform)
+- Strategy notes
+- Content gaps to fill
+
+Considers optimal posting times for each platform.
+
+### 6. The Strategist (NEW)
+**Goal:** Personalized content strategy from intake
+
+Takes intake form data:
+- Coaching niche
+- Target audience
+- Current revenue
+- Current platforms
+- Audience sizes
+- Weekly hours available
+- Primary goal
+- Existing content sources
+
+Outputs:
+- Platform priority ranking with reasoning
+- Content strategy (pillars, cadence, engagement)
+- Quick wins (high impact, low effort actions)
+- Actionable recommendations
 
 ## Tech Stack
 
 - **Framework:** Next.js 14 (App Router)
 - **Language:** TypeScript
-- **Database:** SQLite + Prisma
-- **UI:** Tailwind CSS (black & white only)
-- **LLM:** OpenAI API (with mock mode for demo)
+- **Database:** PostgreSQL + Prisma
+- **UI:** Tailwind CSS
+- **LLM:** OpenAI API (gpt-4o-mini) with mock mode
 - **Validation:** Zod schemas
 
 ## Setup Instructions
@@ -74,13 +105,10 @@ Each task includes: why_now (≤40 words), step-by-step checklist, time estimate
 ### 1. Install Dependencies
 
 ```bash
-cd writers-app
 npm install
 ```
 
 ### 2. Configure Environment
-
-Copy the example environment file:
 
 ```bash
 cp .env.example .env
@@ -92,24 +120,20 @@ Edit `.env`:
 # For demo/testing (no API calls)
 LLM_MODE=mock
 
-# For real LLM processing
-# LLM_MODE=openai
-# OPENAI_API_KEY=your-api-key-here
+# For production
+LLM_MODE=openai
+OPENAI_API_KEY=your-api-key-here
 
-DATABASE_URL="file:./dev.db"
+# Database
+POSTGRES_URL="your-postgres-connection-string"
+POSTGRES_URL_NON_POOLING="your-direct-connection-string"
 ```
 
 ### 3. Initialize Database
 
 ```bash
-# Generate Prisma client
 npx prisma generate
-
-# Create database and tables
 npx prisma db push
-
-# (Optional) Seed with sample data
-npm run db:seed
 ```
 
 ### 4. Run Development Server
@@ -118,129 +142,102 @@ npm run db:seed
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+## API Endpoints
 
-## Usage Guide
+### Run Strategist (Client Intake)
+```bash
+POST /api/strategist
+Content-Type: application/json
 
-### Uploading Content
+{
+  "clientId": "optional-client-id",
+  "input": {
+    "coaching_niche": "Executive Leadership",
+    "target_audience": "C-suite executives at Fortune 500",
+    "current_revenue": "500k_1m",
+    "current_platforms": ["linkedin", "email"],
+    "audience_size": {
+      "linkedin": 5000,
+      "email_list": 2000
+    },
+    "content_time_weekly_hours": 3,
+    "primary_goal": "get_clients",
+    "current_content_sources": ["podcast", "workshops"]
+  }
+}
+```
 
-1. Go to **Upload** page
-2. Either:
-   - **Upload files:** TXT, MD, DOCX, PDF, or ZIP containing multiple files
-   - **Paste text:** Directly paste your writing with an optional title
-3. Click "Upload & Process" or "Create & Process"
-4. The system will ingest and automatically run the agent pipeline
+### Upload Content
+```bash
+POST /api/upload
+Content-Type: multipart/form-data
 
-### Viewing Your Library
+file: [audio/video/text file]
+clientId: optional-client-id
+```
 
-1. Go to **Library** page
-2. Use filters to view by:
-   - **Lane:** SUBMISSION, PLATFORM, PRODUCT, ARCHIVE
-   - **Status:** FINISHED, NEEDS_POLISH, FRAGMENT, SEED
-   - **Quality:** A, B, C
-3. Click any piece title to view detailed agent outputs
-
-### Checking Collections
-
-1. Go to **Collections** page
-2. View ebook candidates compiled by The Compiler
-3. See what's READY vs NEEDS_ASSEMBLY vs NEEDS_NEW_WRITING
-
-### Getting Your Weekly Queue
-
-1. Go to **Queue** page
-2. See your weekly execution list with:
-   - Submission tasks (max 3)
-   - Platform tasks (max 3)
-   - Product tasks (max 1)
-3. Each task has a checklist and time estimate
-4. See "Do Not Touch" list of protected pieces
-
-## Running the Pipeline
-
-The pipeline runs automatically after upload. To manually run:
-
-### Run on Single Piece
+### Run Pipeline on Piece
 ```bash
 POST /api/pipeline/run/[pieceId]
 ```
 
-### Run on All Pieces
+### Run Pipeline on All
 ```bash
 POST /api/pipeline/run-all
 ```
 
-The pipeline executes in order:
-1. **Archivist** → tags all pieces
-2. **Placement** → assigns lanes
-3. **Repurposer** → generates format conversions
-4. **Compiler** → builds collections (catalog-level)
-5. **Executive** → creates weekly queue (catalog-level)
-
-## Mock Mode vs Real Mode
-
-### Mock Mode (LLM_MODE=mock)
-- No API calls
-- Instant processing
-- Deterministic outputs based on word count and simple rules
-- Perfect for demo/testing
-
-### Real Mode (LLM_MODE=openai)
-- Calls OpenAI API (gpt-4o-mini)
-- Requires OPENAI_API_KEY
-- Validates all outputs with Zod schemas
-- Retries once on validation failure
-- Falls back to mock on persistent errors
-
-## File Support
-
-| Format | Status |
-|--------|--------|
-| TXT    | ✓ Full support |
-| MD     | ✓ Full support |
-| DOCX   | ✓ Extracts text with mammoth |
-| PDF    | ⚠️ Attempts extraction; marks for manual review if fails |
-| ZIP    | ✓ Extracts and processes contained files |
-
-## Database Management
-
-### View Database in Browser
+### Get Calendar
 ```bash
-npm run db:studio
+GET /api/calendar/[clientId]
 ```
 
-### Reset Database
+### Get Repurposed Content
 ```bash
-rm prisma/dev.db
-npx prisma db push
+GET /api/content/[pieceId]
 ```
 
-### Backup Database
-```bash
-cp prisma/dev.db prisma/backup-$(date +%Y%m%d).db
-```
+## Content Types Supported
 
-## Design Philosophy
+| Type | Status |
+|------|--------|
+| Podcast Transcripts | ✓ Full support |
+| Video Transcripts | ✓ Full support |
+| Voice Memos | ✓ Full support |
+| Text/Markdown | ✓ Full support |
+| DOCX | ✓ Full support |
+| PDF | ⚠️ Text extraction (may need review) |
 
-### Black & White Only
-No color accents. Clean, calm, professional.
+## Platform Outputs
 
-### No Dashboard Dopamine
-No charts, graphs, or gamification. Just data.
+| Platform | Content Types |
+|----------|--------------|
+| LinkedIn | Story posts, Listicles, Insights, Questions, Hot takes, How-tos, Case studies |
+| Twitter/X | Threads (3-15 tweets), Single tweets |
+| Instagram | Captions, Carousel text, Hashtags |
+| Email | Newsletter drafts, Subject lines, CTAs |
+| Blog | SEO-optimized outlines, Meta descriptions |
 
-### Adult Tool
-Lots of whitespace. Simple typography. Minimal UI.
+## Deliverables Per Client (Monthly)
 
-### Decisions, Not Suggestions
-The agents choose. They don't present options. They decide.
+- **20-30 pieces of content** (across all platforms)
+- **30-day posting calendar** (with optimal times)
+- **Content series** (email sequences, blog series, etc.)
+- **Strategy recommendations** (platform priorities, quick wins)
 
-## Behavioral Constraints (Agents)
+## Multi-Client Support
 
-- No pep talk
-- No generic advice
-- Short, decisive outputs
-- If uncertain, choose safest path (e.g., HOLD_FOR_SUBMISSION)
-- Keep notes tight and useful
+The system supports multiple clients with:
+- Separate content libraries
+- Client-specific strategies
+- Individual calendars
+- Platform credential management (for Tier 2)
+
+## Tier 2 (White-Glove) Features
+
+- VA assignment tracking
+- Posting log (what's been posted, when)
+- Metrics tracking (views, likes, comments)
+- Weekly report generation
 
 ## Development Commands
 
@@ -249,76 +246,15 @@ npm run dev          # Start dev server
 npm run build        # Build for production
 npm run start        # Start production server
 npm run lint         # Run ESLint
-npm run db:push      # Push schema changes to DB
-npm run db:studio    # Open Prisma Studio
-npm run db:seed      # Seed database
+npx prisma studio    # Open database GUI
+npx prisma db push   # Push schema changes
 ```
-
-## Project Structure
-
-```
-writers-app/
-├── prisma/
-│   ├── schema.prisma          # Database schema
-│   └── seed.ts                # Seed script
-├── src/
-│   ├── app/                   # Next.js app router pages
-│   │   ├── api/               # API routes (upload, pipeline)
-│   │   ├── library/           # Library page + piece detail
-│   │   ├── collections/       # Collections page
-│   │   ├── queue/             # Queue page
-│   │   ├── upload/            # Upload page
-│   │   ├── layout.tsx         # Root layout
-│   │   ├── page.tsx           # Landing page
-│   │   └── globals.css        # Global styles
-│   ├── lib/
-│   │   ├── db.ts              # Prisma client
-│   │   ├── llm.ts             # LLM abstraction layer
-│   │   └── schemas.ts         # Zod schemas for agents
-│   ├── services/
-│   │   ├── agents.ts          # Agent pipeline logic
-│   │   └── ingestion.ts       # File ingestion service
-│   └── data/
-│       └── outlets.json       # Literary outlet database
-├── .env                       # Environment variables
-├── package.json               # Dependencies
-└── README.md                  # This file
-```
-
-## Troubleshooting
-
-### Upload fails with "Failed to parse DOCX"
-- Some DOCX files with complex formatting may fail
-- Try saving as plain text or pasting directly
-
-### PDF extraction returns empty text
-- PDFs with scanned images won't extract
-- The system marks these for manual review
-- Re-upload as text or paste content
-
-### Pipeline runs but no results
-- Check LLM_MODE in .env
-- In openai mode, verify OPENAI_API_KEY is valid
-- Check browser console and server logs for errors
-
-### Database locked error
-- Close Prisma Studio if open
-- Restart dev server
-
-## Future Enhancements (Not in MVP)
-
-- Authentication/multi-user
-- Cloud storage
-- Real outlet database with submission tracking
-- Export collections to DOCX/PDF
-- Submission history tracking
-- Email/calendar integration for deadlines
 
 ## License
 
-Private MVP. No distribution.
+Proprietary. Agent-Agent by RBB Ed.
 
 ---
 
-**Agent-Agent Writers Edition.**
-No hype. Just decisions.
+**Agent-Agent Coaches Edition.**
+Turn 1 hour of content into 30 days of posts.

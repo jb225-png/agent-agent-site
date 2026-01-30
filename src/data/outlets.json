@@ -1,98 +1,121 @@
 [
   {
-    "name": "The Paris Review",
-    "category": "literary",
-    "pays": true,
-    "typical_length_range": [2000, 8000],
-    "themes": ["literary fiction", "poetry", "essays", "interviews"],
-    "url": "https://www.theparisreview.org"
+    "name": "LinkedIn",
+    "category": "professional",
+    "primary": true,
+    "content_types": ["posts", "articles", "carousels", "videos"],
+    "optimal_posting": {
+      "days": ["tuesday", "wednesday", "thursday"],
+      "times": ["08:00", "12:00", "17:00"],
+      "frequency": "3-5x per week"
+    },
+    "character_limits": {
+      "post": 3000,
+      "article": "unlimited"
+    },
+    "best_for": ["thought leadership", "B2B", "professional credibility", "client acquisition"],
+    "notes": "Primary platform for executive coaches. Focus on value-driven posts, stories, and actionable insights."
   },
   {
-    "name": "Granta",
-    "category": "literary",
-    "pays": true,
-    "typical_length_range": [3000, 10000],
-    "themes": ["literary fiction", "memoir", "reportage", "photography"],
-    "url": "https://granta.com"
+    "name": "Twitter/X",
+    "category": "social",
+    "primary": true,
+    "content_types": ["tweets", "threads", "replies"],
+    "optimal_posting": {
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "times": ["09:00", "12:00", "15:00", "18:00"],
+      "frequency": "1-3x per day"
+    },
+    "character_limits": {
+      "tweet": 280,
+      "thread_tweet": 280
+    },
+    "best_for": ["quick insights", "engagement", "building authority", "networking"],
+    "notes": "Great for repurposing longer content into bite-sized threads. High engagement potential."
   },
   {
-    "name": "The New Yorker",
-    "category": "magazine",
-    "pays": true,
-    "typical_length_range": [1500, 6000],
-    "themes": ["cultural commentary", "essays", "fiction", "humor"],
-    "url": "https://www.newyorker.com"
+    "name": "Instagram",
+    "category": "social",
+    "primary": false,
+    "content_types": ["posts", "carousels", "reels", "stories"],
+    "optimal_posting": {
+      "days": ["monday", "wednesday", "friday"],
+      "times": ["11:00", "14:00", "19:00"],
+      "frequency": "3-5x per week"
+    },
+    "character_limits": {
+      "caption": 2200,
+      "bio": 150
+    },
+    "best_for": ["personal brand", "behind-the-scenes", "visual content", "younger audience"],
+    "notes": "Secondary platform for most coaches. Carousel posts perform well for educational content."
   },
   {
-    "name": "Electric Literature",
-    "category": "online",
-    "pays": true,
-    "typical_length_range": [1000, 5000],
-    "themes": ["contemporary fiction", "essays", "interviews", "craft"],
-    "url": "https://electricliterature.com"
+    "name": "Email Newsletter",
+    "category": "owned",
+    "primary": true,
+    "content_types": ["newsletter", "sequences", "broadcasts"],
+    "optimal_posting": {
+      "days": ["tuesday", "wednesday", "thursday"],
+      "times": ["06:00", "10:00"],
+      "frequency": "1-2x per week"
+    },
+    "character_limits": {
+      "subject": 50,
+      "preview": 100,
+      "body": "500-1500 words recommended"
+    },
+    "best_for": ["deep engagement", "nurturing leads", "direct relationship", "sales"],
+    "notes": "Owned audience. Highest ROI channel. Convert social followers to subscribers."
   },
   {
-    "name": "Catapult",
-    "category": "online",
-    "pays": true,
-    "typical_length_range": [1500, 4000],
-    "themes": ["personal essays", "craft", "culture", "identity"],
-    "url": "https://catapult.co"
+    "name": "Blog/Website",
+    "category": "owned",
+    "primary": false,
+    "content_types": ["articles", "case studies", "guides"],
+    "optimal_posting": {
+      "days": ["any"],
+      "times": ["any"],
+      "frequency": "1-4x per month"
+    },
+    "character_limits": {
+      "article": "1000-3000 words recommended"
+    },
+    "best_for": ["SEO", "evergreen content", "credibility", "lead magnets"],
+    "notes": "Long-form home. Repurpose into social content. Good for search traffic."
   },
   {
-    "name": "The Rumpus",
-    "category": "online",
-    "pays": true,
-    "typical_length_range": [1500, 4000],
-    "themes": ["essays", "interviews", "reviews", "poetry"],
-    "url": "https://therumpus.net"
+    "name": "YouTube",
+    "category": "video",
+    "primary": false,
+    "content_types": ["long-form videos", "shorts", "livestreams"],
+    "optimal_posting": {
+      "days": ["tuesday", "thursday", "saturday"],
+      "times": ["12:00", "15:00"],
+      "frequency": "1-2x per week"
+    },
+    "character_limits": {
+      "title": 100,
+      "description": 5000
+    },
+    "best_for": ["deep content", "tutorials", "interviews", "search discovery"],
+    "notes": "High effort, high reward. Scripts can be repurposed from existing content."
   },
   {
-    "name": "Guernica",
-    "category": "magazine",
-    "pays": true,
-    "typical_length_range": [2000, 6000],
-    "themes": ["art", "politics", "global affairs", "photography"],
-    "url": "https://www.guernicamag.com"
-  },
-  {
-    "name": "The Believer",
-    "category": "literary",
-    "pays": true,
-    "typical_length_range": [2000, 8000],
-    "themes": ["essays", "interviews", "reviews", "art"],
-    "url": "https://thebeliever.net"
-  },
-  {
-    "name": "n+1",
-    "category": "magazine",
-    "pays": true,
-    "typical_length_range": [3000, 10000],
-    "themes": ["politics", "literature", "culture", "economics"],
-    "url": "https://www.nplusonemag.com"
-  },
-  {
-    "name": "LitHub",
-    "category": "online",
-    "pays": true,
-    "typical_length_range": [800, 2500],
-    "themes": ["book culture", "essays", "excerpts", "lists"],
-    "url": "https://lithub.com"
-  },
-  {
-    "name": "Longreads",
-    "category": "online",
-    "pays": true,
-    "typical_length_range": [2000, 10000],
-    "themes": ["narrative journalism", "essays", "features", "profiles"],
-    "url": "https://longreads.com"
-  },
-  {
-    "name": "McSweeney's",
-    "category": "literary",
-    "pays": true,
-    "typical_length_range": [500, 3000],
-    "themes": ["humor", "satire", "experimental", "quirky"],
-    "url": "https://www.mcsweeneys.net"
+    "name": "Podcast",
+    "category": "audio",
+    "primary": false,
+    "content_types": ["episodes", "guest appearances"],
+    "optimal_posting": {
+      "days": ["monday", "wednesday"],
+      "times": ["05:00"],
+      "frequency": "1x per week"
+    },
+    "character_limits": {
+      "title": 100,
+      "description": 4000
+    },
+    "best_for": ["thought leadership", "interviews", "deep dives", "passive consumption"],
+    "notes": "Great source content for repurposing. One episode = 20+ pieces of content."
   }
 ]

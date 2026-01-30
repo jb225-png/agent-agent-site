@@ -1,5 +1,5 @@
 import { runAgent } from "@/lib/llm";
-import { startOfWeek } from "date-fns";
+import { StrategistInput } from "@/lib/schemas";
 
 async function getPrisma() {
   const { prisma } = await import("@/lib/db");
@@ -9,7 +9,7 @@ async function getPrisma() {
 /**
  * Run The Archivist on a single piece
  */
-export async function runArchivistOnPiece(pieceId: string) {
+export async function runArchivistOnPiece(pieceId: string, clientContext?: any) {
   const prisma = await getPrisma();
   const piece = await prisma.piece.findUnique({
     where: { id: pieceId },
@@ -19,7 +19,7 @@ export async function runArchivistOnPiece(pieceId: string) {
     throw new Error(`Piece ${pieceId} not found`);
   }
 
-  const output = await runAgent("archivist", { piece });
+  const output = await runAgent("archivist", { piece, clientContext });
 
   // Save to database
   await prisma.archivistTags.upsert({
@@ -28,18 +28,20 @@ export async function runArchivistOnPiece(pieceId: string) {
       pieceId,
       themesJson: JSON.stringify(output.themes),
       voiceTagsJson: JSON.stringify(output.voice_tags),
+      contentType: output.content_type,
       status: output.status,
       qualityBand: output.quality_band,
+      keyInsightsJson: JSON.stringify(output.key_insights),
       notes: output.notes,
-      lineageJson: JSON.stringify(output.project_lineage || {}),
     },
     update: {
       themesJson: JSON.stringify(output.themes),
       voiceTagsJson: JSON.stringify(output.voice_tags),
+      contentType: output.content_type,
       status: output.status,
       qualityBand: output.quality_band,
+      keyInsightsJson: JSON.stringify(output.key_insights),
       notes: output.notes,
-      lineageJson: JSON.stringify(output.project_lineage || {}),
     },
   });
 
@@ -49,7 +51,7 @@ export async function runArchivistOnPiece(pieceId: string) {
 /**
  * Run The Placement Agent on a single piece
  */
-export async function runPlacementOnPiece(pieceId: string) {
+export async function runPlacementOnPiece(pieceId: string, clientContext?: any) {
   const prisma = await getPrisma();
   const piece = await prisma.piece.findUnique({
     where: { id: pieceId },
@@ -59,25 +61,25 @@ export async function runPlacementOnPiece(pieceId: string) {
     throw new Error(`Piece ${pieceId} not found`);
   }
 
-  const output = await runAgent("placement", { piece });
+  const output = await runAgent("placement", { piece, clientContext });
 
   // Save to database
   await prisma.placement.upsert({
     where: { pieceId },
     create: {
       pieceId,
-      primaryLane: output.primary_lane,
-      secondaryJson: JSON.stringify(output.secondary_allowed_uses || []),
-      exclusivity: output.exclusivity_constraints,
-      recommendedNextAction: output.recommended_next_action,
-      outletsJson: JSON.stringify(output.target_outlets || []),
+      primaryPlatform: output.primary_platform,
+      secondaryPlatformsJson: JSON.stringify(output.secondary_platforms || []),
+      contentPotential: output.content_potential,
+      recommendedFormatsJson: JSON.stringify(output.recommended_formats),
+      reasoning: output.reasoning,
     },
     update: {
-      primaryLane: output.primary_lane,
-      secondaryJson: JSON.stringify(output.secondary_allowed_uses || []),
-      exclusivity: output.exclusivity_constraints,
-      recommendedNextAction: output.recommended_next_action,
-      outletsJson: JSON.stringify(output.target_outlets || []),
+      primaryPlatform: output.primary_platform,
+      secondaryPlatformsJson: JSON.stringify(output.secondary_platforms || []),
+      contentPotential: output.content_potential,
+      recommendedFormatsJson: JSON.stringify(output.recommended_formats),
+      reasoning: output.reasoning,
     },
   });
 
@@ -87,7 +89,7 @@ export async function runPlacementOnPiece(pieceId: string) {
 /**
  * Run The Repurposer on a single piece
  */
-export async function runRepurposerOnPiece(pieceId: string) {
+export async function runRepurposerOnPiece(pieceId: string, clientContext?: any) {
   const prisma = await getPrisma();
   const piece = await prisma.piece.findUnique({
     where: { id: pieceId },
@@ -98,27 +100,79 @@ export async function runRepurposerOnPiece(pieceId: string) {
     throw new Error(`Piece ${pieceId} not found`);
   }
 
-  const exclusivity = piece.placement?.exclusivity || "SAFE_TO_PUBLISH";
-
-  // Don't repurpose if held for submission
-  if (exclusivity === "HOLD_FOR_SUBMISSION") {
-    return { recommended_formats: [], outputs: [] };
-  }
-
-  const output = await runAgent("repurposer", { piece, exclusivity });
+  const output = await runAgent("repurposer", { piece, clientContext });
 
   // Delete old outputs for this piece
   await prisma.repurposeOutput.deleteMany({
     where: { pieceId },
   });
 
-  // Save new outputs
-  for (const item of output.outputs) {
+  // Save LinkedIn posts
+  for (let i = 0; i < output.linkedin_posts.length; i++) {
+    const post = output.linkedin_posts[i];
     await prisma.repurposeOutput.create({
       data: {
         pieceId,
-        format: item.format,
-        content: item.content,
+        platform: "LINKEDIN",
+        format: post.format,
+        contentJson: JSON.stringify(post),
+        position: i,
+      },
+    });
+  }
+
+  // Save Twitter threads
+  for (let i = 0; i < output.twitter_threads.length; i++) {
+    const thread = output.twitter_threads[i];
+    await prisma.repurposeOutput.create({
+      data: {
+        pieceId,
+        platform: "TWITTER",
+        format: "thread",
+        contentJson: JSON.stringify(thread),
+        position: i,
+      },
+    });
+  }
+
+  // Save Instagram captions
+  for (let i = 0; i < output.instagram_captions.length; i++) {
+    const caption = output.instagram_captions[i];
+    await prisma.repurposeOutput.create({
+      data: {
+        pieceId,
+        platform: "INSTAGRAM",
+        format: "caption",
+        contentJson: JSON.stringify(caption),
+        position: i,
+      },
+    });
+  }
+
+  // Save email drafts
+  for (let i = 0; i < output.email_drafts.length; i++) {
+    const email = output.email_drafts[i];
+    await prisma.repurposeOutput.create({
+      data: {
+        pieceId,
+        platform: "EMAIL",
+        format: "newsletter",
+        contentJson: JSON.stringify(email),
+        position: i,
+      },
+    });
+  }
+
+  // Save blog outlines
+  for (let i = 0; i < output.blog_outlines.length; i++) {
+    const outline = output.blog_outlines[i];
+    await prisma.repurposeOutput.create({
+      data: {
+        pieceId,
+        platform: "BLOG",
+        format: "outline",
+        contentJson: JSON.stringify(outline),
+        position: i,
       },
     });
   }
@@ -127,11 +181,15 @@ export async function runRepurposerOnPiece(pieceId: string) {
 }
 
 /**
- * Run The Compiler on all pieces
+ * Run The Compiler on all pieces for a client
  */
-export async function runCompiler() {
+export async function runCompiler(clientId?: string) {
   const prisma = await getPrisma();
+  
+  const whereClause = clientId ? { clientId } : {};
+  
   const pieces = await prisma.piece.findMany({
+    where: whereClause,
     include: {
       archivistTags: true,
       placement: true,
@@ -140,20 +198,24 @@ export async function runCompiler() {
 
   const output = await runAgent("compiler", { pieces });
 
-  // Delete old collections
-  await prisma.collection.deleteMany();
+  // Delete old content series
+  await prisma.contentSeries.deleteMany({
+    where: clientId ? { clientId } : {},
+  });
 
-  // Save new collections
-  for (const collection of output.collections) {
-    await prisma.collection.create({
+  // Save new content series
+  for (const series of output.content_series) {
+    await prisma.contentSeries.create({
       data: {
-        titleWorking: collection.title_working,
-        positioning: collection.positioning,
-        includedPieceIdsJson: JSON.stringify(collection.included_piece_ids),
-        missingJson: JSON.stringify(collection.missing_connective_tissue),
-        estimatedEffortHours: collection.estimated_effort_hours,
-        recommendedPriceBand: collection.recommended_price_band,
-        launchReadiness: collection.launch_readiness,
+        clientId: clientId || "default",
+        title: series.title,
+        description: series.description,
+        theme: series.theme,
+        includedPieceIdsJson: JSON.stringify(series.included_piece_ids),
+        recommendedSequenceJson: JSON.stringify(series.recommended_sequence),
+        seriesType: series.series_type,
+        estimatedPieces: series.estimated_pieces,
+        gapsJson: JSON.stringify(series.gaps),
       },
     });
   }
@@ -162,11 +224,15 @@ export async function runCompiler() {
 }
 
 /**
- * Run The Executive to create weekly queue
+ * Run The Executive to create 30-day calendar
  */
-export async function runExecutive() {
+export async function runExecutive(clientId?: string) {
   const prisma = await getPrisma();
+  
+  const whereClause = clientId ? { clientId } : {};
+  
   const pieces = await prisma.piece.findMany({
+    where: whereClause,
     include: {
       archivistTags: true,
       placement: true,
@@ -175,27 +241,19 @@ export async function runExecutive() {
 
   const output = await runAgent("executive", { pieces });
 
-  // Get current week start
-  const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }); // Monday
-
-  // Delete old queue for this week
-  await prisma.weeklyQueue.deleteMany({
-    where: { weekStartDate: weekStart },
+  // Delete old calendar for this client
+  await prisma.contentCalendar.deleteMany({
+    where: clientId ? { clientId } : {},
   });
 
-  // Combine all tasks
-  const allTasks = [
-    ...output.weekly_queue.submission_tasks,
-    ...output.weekly_queue.platform_tasks,
-    ...output.weekly_queue.product_tasks,
-  ];
-
-  // Save new queue
-  await prisma.weeklyQueue.create({
+  // Save new calendar
+  await prisma.contentCalendar.create({
     data: {
-      weekStartDate: weekStart,
-      tasksJson: JSON.stringify(allTasks),
-      doNotTouchJson: JSON.stringify(output.do_not_touch),
+      clientId: clientId || "default",
+      calendarJson: JSON.stringify(output.calendar),
+      weeklyBreakdownJson: JSON.stringify(output.weekly_breakdown),
+      strategyNotes: output.strategy_notes,
+      contentGapsJson: JSON.stringify(output.content_gaps),
     },
   });
 
@@ -203,18 +261,51 @@ export async function runExecutive() {
 }
 
 /**
+ * Run The Strategist for client intake
+ */
+export async function runStrategist(input: StrategistInput, clientId?: string) {
+  const prisma = await getPrisma();
+  
+  const output = await runAgent("strategist", { strategistInput: input });
+
+  // Save strategy to database
+  if (clientId) {
+    await prisma.clientStrategy.upsert({
+      where: { clientId },
+      create: {
+        clientId,
+        inputJson: JSON.stringify(input),
+        platformPriorityJson: JSON.stringify(output.platform_priority),
+        contentStrategyJson: JSON.stringify(output.content_strategy),
+        quickWinsJson: JSON.stringify(output.quick_wins),
+        recommendationsJson: JSON.stringify(output.recommendations),
+      },
+      update: {
+        inputJson: JSON.stringify(input),
+        platformPriorityJson: JSON.stringify(output.platform_priority),
+        contentStrategyJson: JSON.stringify(output.content_strategy),
+        quickWinsJson: JSON.stringify(output.quick_wins),
+        recommendationsJson: JSON.stringify(output.recommendations),
+      },
+    });
+  }
+
+  return output;
+}
+
+/**
  * Run entire pipeline on a single piece
  */
-export async function runPipelineOnPiece(pieceId: string) {
+export async function runPipelineOnPiece(pieceId: string, clientContext?: any) {
   console.log(`Running pipeline on piece ${pieceId}...`);
 
-  const archivist = await runArchivistOnPiece(pieceId);
+  const archivist = await runArchivistOnPiece(pieceId, clientContext);
   console.log(`✓ Archivist complete`);
 
-  const placement = await runPlacementOnPiece(pieceId);
+  const placement = await runPlacementOnPiece(pieceId, clientContext);
   console.log(`✓ Placement complete`);
 
-  const repurposer = await runRepurposerOnPiece(pieceId);
+  const repurposer = await runRepurposerOnPiece(pieceId, clientContext);
   console.log(`✓ Repurposer complete`);
 
   return { archivist, placement, repurposer };
@@ -223,23 +314,51 @@ export async function runPipelineOnPiece(pieceId: string) {
 /**
  * Run entire pipeline on all pieces
  */
-export async function runPipelineOnAll() {
+export async function runPipelineOnAll(clientId?: string, clientContext?: any) {
   const prisma = await getPrisma();
   console.log("Running pipeline on all pieces...");
 
-  const pieces = await prisma.piece.findMany();
+  const whereClause = clientId ? { clientId } : {};
+  const pieces = await prisma.piece.findMany({ where: whereClause });
 
   // Run individual piece agents
   for (const piece of pieces) {
-    await runPipelineOnPiece(piece.id);
+    await runPipelineOnPiece(piece.id, clientContext);
   }
 
   // Run collection-level agents
   console.log("Running Compiler...");
-  await runCompiler();
+  await runCompiler(clientId);
 
   console.log("Running Executive...");
-  await runExecutive();
+  await runExecutive(clientId);
 
   console.log("✓ Pipeline complete");
+}
+
+/**
+ * Full client onboarding: Strategist + Pipeline
+ */
+export async function runClientOnboarding(
+  clientId: string,
+  strategistInput: StrategistInput
+) {
+  console.log(`Starting onboarding for client ${clientId}...`);
+
+  // First run strategist
+  console.log("Running Strategist...");
+  const strategy = await runStrategist(strategistInput, clientId);
+  console.log(`✓ Strategy complete`);
+
+  // Build client context from strategy
+  const clientContext = {
+    niche: strategistInput.coaching_niche,
+    audience: strategistInput.target_audience,
+    platforms: strategy.platform_priority.map((p: any) => p.platform),
+  };
+
+  // Run full pipeline with client context
+  await runPipelineOnAll(clientId, clientContext);
+
+  return strategy;
 }
