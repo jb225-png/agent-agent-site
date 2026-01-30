@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+// Force dynamic rendering (fetch from DB on each request)
+export const dynamic = "force-dynamic";
+
 async function getPrisma() {
   const { prisma } = await import("@/lib/db");
   return prisma;
