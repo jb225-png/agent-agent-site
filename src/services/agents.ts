@@ -372,15 +372,37 @@ export async function runExecutive(clientId?: string) {
   // Force mock mode to avoid timeout
   const output = generateCalendar(pieces);
 
-  // Delete old calendar for this client
+  // Delete old calendar
   await prisma.contentCalendar.deleteMany({
     where: clientId ? { clientId } : {},
   });
 
-  // Save new calendar (handle both old and new format)
+  // For calendar storage, we need a valid clientId (foreign key constraint)
+  // If no clientId, create/find a default client
+  let finalClientId = clientId;
+  if (!finalClientId) {
+    // Find or create default client
+    let defaultClient = await prisma.client.findFirst({
+      where: { email: "default@agent-agent.local" },
+    });
+    if (!defaultClient) {
+      defaultClient = await prisma.client.create({
+        data: {
+          name: "Default Client",
+          email: "default@agent-agent.local",
+          coachingNiche: "General",
+          tier: "TIER_1",
+          status: "ACTIVE",
+        },
+      });
+    }
+    finalClientId = defaultClient.id;
+  }
+
+  // Save new calendar
   await prisma.contentCalendar.create({
     data: {
-      clientId: clientId || "default",
+      clientId: finalClientId,
       // Store the entire output as JSON so we can access weekly_calendar, posting_schedule, etc.
       calendarJson: JSON.stringify(output),
       weeklyBreakdownJson: JSON.stringify(output.calendar_summary || {}),
