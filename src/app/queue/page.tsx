@@ -25,9 +25,17 @@ export default async function QueuePage() {
       if (parsed.weekly_calendar) {
         calendarData = parsed;
         isNewFormat = true;
+      } else if (parsed.calendar_summary) {
+        // Also new format but stored differently
+        calendarData = parsed;
+        isNewFormat = true;
       } else if (Array.isArray(parsed)) {
         calendarData = { calendar: parsed };
         isNewFormat = false;
+      } else {
+        // Try to use whatever we have
+        calendarData = parsed;
+        isNewFormat = !!parsed.weekly_calendar || !!parsed.calendar_summary;
       }
     } catch {
       calendarData = null;

@@ -236,6 +236,7 @@ export async function runExecutive(clientId?: string) {
     include: {
       archivistTags: true,
       placement: true,
+      repurposeOutputs: true,
     },
   });
 
@@ -246,14 +247,15 @@ export async function runExecutive(clientId?: string) {
     where: clientId ? { clientId } : {},
   });
 
-  // Save new calendar
+  // Save new calendar (handle both old and new format)
   await prisma.contentCalendar.create({
     data: {
       clientId: clientId || "default",
-      calendarJson: JSON.stringify(output.calendar),
-      weeklyBreakdownJson: JSON.stringify(output.weekly_breakdown),
-      strategyNotes: output.strategy_notes,
-      contentGapsJson: JSON.stringify(output.content_gaps),
+      // Store the entire output as JSON so we can access weekly_calendar, posting_schedule, etc.
+      calendarJson: JSON.stringify(output),
+      weeklyBreakdownJson: JSON.stringify(output.calendar_summary || output.weekly_breakdown || {}),
+      strategyNotes: output.strategy_notes || "",
+      contentGapsJson: JSON.stringify(output.content_gaps || []),
     },
   });
 
@@ -297,7 +299,12 @@ export async function runStrategist(input: StrategistInput, clientId?: string) {
  * Run entire pipeline on a single piece
  */
 export async function runPipelineOnPiece(pieceId: string, clientContext?: any) {
+  const prisma = await getPrisma();
   console.log(`Running pipeline on piece ${pieceId}...`);
+
+  // Get the piece to find its clientId
+  const piece = await prisma.piece.findUnique({ where: { id: pieceId } });
+  const clientId = piece?.clientId || undefined;
 
   const archivist = await runArchivistOnPiece(pieceId, clientContext);
   console.log(`✓ Archivist complete`);
@@ -308,7 +315,11 @@ export async function runPipelineOnPiece(pieceId: string, clientContext?: any) {
   const repurposer = await runRepurposerOnPiece(pieceId, clientContext);
   console.log(`✓ Repurposer complete`);
 
-  return { archivist, placement, repurposer };
+  // Also run Executive to generate/update the 30-day calendar
+  const executive = await runExecutive(clientId);
+  console.log(`✓ Executive (30-day calendar) complete`);
+
+  return { archivist, placement, repurposer, executive };
 }
 
 /**
