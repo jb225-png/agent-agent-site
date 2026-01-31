@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 // FREE AUDIT APPLICATION FORM
-// Collects intake info + embeds Calendly for booking
+// Brand: Deep Blue (#1E3A8A), Teal (#0D9488), Amber (#F59E0B)
 
 interface FormData {
   name: string;
@@ -19,11 +19,11 @@ interface FormData {
 }
 
 const REVENUE_OPTIONS = [
-  "Under $100k",
-  "$100k - $250k",
+  "Under $250k",
   "$250k - $500k",
   "$500k - $1M",
-  "$1M - $5M",
+  "$1M - $3M",
+  "$3M - $5M",
   "$5M+",
 ];
 
@@ -34,7 +34,6 @@ const CONTENT_TYPE_OPTIONS = [
   "Voice memos/notes",
   "Webinar recordings",
   "Course content",
-  "Other",
 ];
 
 const PLATFORM_OPTIONS = [
@@ -44,10 +43,9 @@ const PLATFORM_OPTIONS = [
   "Email newsletter",
   "Blog/Website",
   "YouTube",
-  "TikTok",
 ];
 
-// [CONFIG: CALENDLY_URL] - Replace with actual Calendly link
+// [CONFIG: CALENDLY_URL] - Replace with actual Calendly link from Robert
 const CALENDLY_URL = "https://calendly.com/your-link-here";
 
 export default function AuditApplyPage() {
@@ -83,7 +81,6 @@ export default function AuditApplyPage() {
     setIsSubmitting(true);
     
     try {
-      // Submit to API endpoint
       const response = await fetch("/api/audit/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -106,58 +103,61 @@ export default function AuditApplyPage() {
   // Step 1: Basic Info
   const renderStep1 = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Tell us about yourself</h2>
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900">Tell us about yourself</h2>
+        <p className="text-gray-600 mt-1">So we can personalize your audit</p>
+      </div>
       
       <div>
-        <label className="block font-medium mb-2">Your Name *</label>
+        <label className="block font-medium mb-2 text-gray-900">Your Name *</label>
         <input
           type="text"
           value={formData.name}
           onChange={(e) => updateField("name", e.target.value)}
-          className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none"
+          className="w-full border border-gray-300 px-4 py-3 focus:border-[#1E3A8A] focus:ring-1 focus:ring-[#1E3A8A] focus:outline-none transition-colors"
           placeholder="Jane Smith"
         />
       </div>
 
       <div>
-        <label className="block font-medium mb-2">Email *</label>
+        <label className="block font-medium mb-2 text-gray-900">Email *</label>
         <input
           type="email"
           value={formData.email}
           onChange={(e) => updateField("email", e.target.value)}
-          className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none"
+          className="w-full border border-gray-300 px-4 py-3 focus:border-[#1E3A8A] focus:ring-1 focus:ring-[#1E3A8A] focus:outline-none transition-colors"
           placeholder="jane@example.com"
         />
       </div>
 
       <div>
-        <label className="block font-medium mb-2">Business Name</label>
+        <label className="block font-medium mb-2 text-gray-900">Business Name</label>
         <input
           type="text"
           value={formData.businessName}
           onChange={(e) => updateField("businessName", e.target.value)}
-          className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none"
+          className="w-full border border-gray-300 px-4 py-3 focus:border-[#1E3A8A] focus:ring-1 focus:ring-[#1E3A8A] focus:outline-none transition-colors"
           placeholder="Smith Coaching"
         />
       </div>
 
       <div>
-        <label className="block font-medium mb-2">Website</label>
+        <label className="block font-medium mb-2 text-gray-900">Website</label>
         <input
           type="url"
           value={formData.website}
           onChange={(e) => updateField("website", e.target.value)}
-          className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none"
+          className="w-full border border-gray-300 px-4 py-3 focus:border-[#1E3A8A] focus:ring-1 focus:ring-[#1E3A8A] focus:outline-none transition-colors"
           placeholder="https://example.com"
         />
       </div>
 
       <div>
-        <label className="block font-medium mb-2">Annual Revenue *</label>
+        <label className="block font-medium mb-2 text-gray-900">Annual Revenue *</label>
         <select
           value={formData.revenue}
           onChange={(e) => updateField("revenue", e.target.value)}
-          className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none bg-white"
+          className="w-full border border-gray-300 px-4 py-3 focus:border-[#1E3A8A] focus:ring-1 focus:ring-[#1E3A8A] focus:outline-none bg-white transition-colors"
         >
           <option value="">Select range...</option>
           {REVENUE_OPTIONS.map((opt) => (
@@ -169,7 +169,7 @@ export default function AuditApplyPage() {
       <button
         onClick={() => setStep(2)}
         disabled={!formData.name || !formData.email || !formData.revenue}
-        className="w-full bg-black text-white py-4 font-semibold hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+        className="w-full bg-[#1E3A8A] text-white py-4 font-semibold hover:bg-[#1e3a8a]/90 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
       >
         Continue →
       </button>
@@ -179,20 +179,23 @@ export default function AuditApplyPage() {
   // Step 2: Content & Platforms
   const renderStep2 = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Your content situation</h2>
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900">Your content situation</h2>
+        <p className="text-gray-600 mt-1">Help us understand what you have to work with</p>
+      </div>
       
       <div>
-        <label className="block font-medium mb-3">What content do you already have? *</label>
+        <label className="block font-medium mb-3 text-gray-900">What content do you already have? *</label>
         <div className="grid grid-cols-2 gap-2">
           {CONTENT_TYPE_OPTIONS.map((opt) => (
             <button
               key={opt}
               type="button"
               onClick={() => toggleArrayField("contentTypes", opt)}
-              className={`px-4 py-2 border text-left text-sm transition-colors ${
+              className={`px-4 py-3 border text-left text-sm transition-colors ${
                 formData.contentTypes.includes(opt)
-                  ? "border-black bg-black text-white"
-                  : "border-gray-300 hover:border-black"
+                  ? "border-[#1E3A8A] bg-[#1E3A8A] text-white"
+                  : "border-gray-300 hover:border-[#1E3A8A]"
               }`}
             >
               {opt}
@@ -202,17 +205,17 @@ export default function AuditApplyPage() {
       </div>
 
       <div>
-        <label className="block font-medium mb-3">Which platforms do you want to post on? *</label>
+        <label className="block font-medium mb-3 text-gray-900">Which platforms do you want to post on? *</label>
         <div className="grid grid-cols-2 gap-2">
           {PLATFORM_OPTIONS.map((opt) => (
             <button
               key={opt}
               type="button"
               onClick={() => toggleArrayField("platforms", opt)}
-              className={`px-4 py-2 border text-left text-sm transition-colors ${
+              className={`px-4 py-3 border text-left text-sm transition-colors ${
                 formData.platforms.includes(opt)
-                  ? "border-black bg-black text-white"
-                  : "border-gray-300 hover:border-black"
+                  ? "border-[#0D9488] bg-[#0D9488] text-white"
+                  : "border-gray-300 hover:border-[#0D9488]"
               }`}
             >
               {opt}
@@ -222,13 +225,13 @@ export default function AuditApplyPage() {
       </div>
 
       <div>
-        <label className="block font-medium mb-2">
+        <label className="block font-medium mb-2 text-gray-900">
           What&apos;s your biggest content challenge right now?
         </label>
         <textarea
           value={formData.biggestChallenge}
           onChange={(e) => updateField("biggestChallenge", e.target.value)}
-          className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none h-24 resize-none"
+          className="w-full border border-gray-300 px-4 py-3 focus:border-[#1E3A8A] focus:ring-1 focus:ring-[#1E3A8A] focus:outline-none h-24 resize-none transition-colors"
           placeholder="e.g., I have tons of podcast content but never repurpose it..."
         />
       </div>
@@ -236,14 +239,14 @@ export default function AuditApplyPage() {
       <div className="flex gap-4">
         <button
           onClick={() => setStep(1)}
-          className="flex-1 border border-black py-4 font-semibold hover:bg-gray-100 transition-colors"
+          className="flex-1 border border-gray-300 py-4 font-semibold hover:bg-gray-50 transition-colors"
         >
           ← Back
         </button>
         <button
           onClick={() => setStep(3)}
           disabled={formData.contentTypes.length === 0 || formData.platforms.length === 0}
-          className="flex-1 bg-black text-white py-4 font-semibold hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 bg-[#1E3A8A] text-white py-4 font-semibold hover:bg-[#1e3a8a]/90 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
         >
           Continue →
         </button>
@@ -254,44 +257,50 @@ export default function AuditApplyPage() {
   // Step 3: Content Sample
   const renderStep3 = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Share a content sample</h2>
-      <p className="text-gray-600">
-        Paste a transcript, blog post, or notes below. This is what we&apos;ll use for your free audit.
-        The more you share, the better we can show you what&apos;s possible.
-      </p>
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900">Share a content sample</h2>
+        <p className="text-gray-600 mt-1">
+          This is what we&apos;ll use for your free audit. The more you share, the better we can show you what&apos;s possible.
+        </p>
+      </div>
       
       <div>
-        <label className="block font-medium mb-2">Your Content Sample *</label>
+        <label className="block font-medium mb-2 text-gray-900">Your Content Sample *</label>
         <textarea
           value={formData.contentSample}
           onChange={(e) => updateField("contentSample", e.target.value)}
-          className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none h-64 resize-none font-mono text-sm"
+          className="w-full border border-gray-300 px-4 py-3 focus:border-[#1E3A8A] focus:ring-1 focus:ring-[#1E3A8A] focus:outline-none h-64 resize-none font-mono text-sm transition-colors"
           placeholder="Paste your podcast transcript, blog post, or notes here..."
         />
-        <p className="text-sm text-gray-500 mt-2">
-          {formData.contentSample.length} characters
-          {formData.contentSample.length > 500 && " ✓"}
-        </p>
+        <div className="flex justify-between mt-2">
+          <p className="text-sm text-gray-500">
+            Paste a transcript, blog post, voice memo notes, etc.
+          </p>
+          <p className={`text-sm ${formData.contentSample.length >= 500 ? "text-[#0D9488]" : "text-gray-500"}`}>
+            {formData.contentSample.length} characters
+            {formData.contentSample.length >= 500 && " ✓"}
+          </p>
+        </div>
       </div>
 
       <div className="flex gap-4">
         <button
           onClick={() => setStep(2)}
-          className="flex-1 border border-black py-4 font-semibold hover:bg-gray-100 transition-colors"
+          className="flex-1 border border-gray-300 py-4 font-semibold hover:bg-gray-50 transition-colors"
         >
           ← Back
         </button>
         <button
           onClick={handleSubmit}
           disabled={formData.contentSample.length < 200 || isSubmitting}
-          className="flex-1 bg-black text-white py-4 font-semibold hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 bg-[#0D9488] text-white py-4 font-semibold hover:bg-[#0D9488]/90 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
         >
           {isSubmitting ? "Submitting..." : "Submit & Book Call →"}
         </button>
       </div>
       
       {formData.contentSample.length < 200 && formData.contentSample.length > 0 && (
-        <p className="text-sm text-red-600">
+        <p className="text-sm text-amber-600">
           Please provide at least 200 characters for a meaningful audit.
         </p>
       )}
@@ -302,28 +311,34 @@ export default function AuditApplyPage() {
   const renderSuccess = () => (
     <div className="space-y-8">
       <div className="text-center">
-        <div className="text-5xl mb-4">✓</div>
-        <h2 className="text-2xl font-bold mb-2">Application Received!</h2>
+        <div className="w-16 h-16 bg-[#0D9488] text-white flex items-center justify-center text-3xl mx-auto mb-4">
+          ✓
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Received!</h2>
         <p className="text-gray-600">
-          We&apos;re running your content through Agent-Agent now. 
+          We&apos;re running your content through Agent→Agent now. 
           Book a time below to review your audit results.
         </p>
       </div>
       
       {/* Calendly Embed */}
-      <div className="border border-gray-200">
-        <iframe
-          src={CALENDLY_URL}
-          width="100%"
-          height="700"
-          frameBorder="0"
-          title="Schedule a call"
-        />
+      <div className="border border-gray-200 bg-gray-50 min-h-[600px] flex items-center justify-center">
+        <div className="text-center p-8">
+          <p className="text-gray-500 mb-4">Calendly booking widget will appear here</p>
+          <a 
+            href={CALENDLY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-[#1E3A8A] text-white px-6 py-3 font-semibold hover:bg-[#1e3a8a]/90 transition-colors"
+          >
+            Book Your Call →
+          </a>
+        </div>
       </div>
       
       <p className="text-center text-gray-500 text-sm">
         Can&apos;t find a time that works?{" "}
-        <a href="mailto:hello@agent-agent.com" className="underline">
+        <a href="mailto:rbb.outreach@gmail.com" className="text-[#1E3A8A] underline">
           Email us
         </a>
       </p>
@@ -334,31 +349,43 @@ export default function AuditApplyPage() {
   const renderProgress = () => (
     <div className="flex items-center justify-center gap-2 mb-8">
       {[1, 2, 3].map((s) => (
-        <div
-          key={s}
-          className={`w-3 h-3 rounded-full transition-colors ${
-            s <= step ? "bg-black" : "bg-gray-200"
-          }`}
-        />
+        <div key={s} className="flex items-center">
+          <div
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+              s < step
+                ? "bg-[#0D9488] text-white"
+                : s === step
+                ? "bg-[#1E3A8A] text-white"
+                : "bg-gray-200 text-gray-500"
+            }`}
+          >
+            {s < step ? "✓" : s}
+          </div>
+          {s < 3 && (
+            <div className={`w-12 h-0.5 ${s < step ? "bg-[#0D9488]" : "bg-gray-200"}`} />
+          )}
+        </div>
       ))}
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-xl mx-auto px-6">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/audit" className="text-gray-500 hover:text-black text-sm">
+          <Link href="/audit" className="text-gray-500 hover:text-[#1E3A8A] text-sm flex items-center gap-1">
             ← Back to overview
           </Link>
         </div>
 
-        <div className="border border-black p-8 md:p-12">
-          <h1 className="text-3xl font-bold mb-2 text-center">Free Content Audit</h1>
-          <p className="text-gray-600 text-center mb-8">
-            See exactly what Agent-Agent can create from your content
-          </p>
+        <div className="bg-white border border-gray-200 p-8 md:p-12 shadow-sm">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Free Content Audit</h1>
+            <p className="text-gray-600 mt-2">
+              See exactly what Agent→Agent can create from your content
+            </p>
+          </div>
 
           {!submitted && renderProgress()}
 
@@ -372,6 +399,13 @@ export default function AuditApplyPage() {
             </>
           )}
         </div>
+
+        {/* Trust indicators */}
+        {!submitted && (
+          <div className="mt-8 text-center text-sm text-gray-500">
+            <p>🔒 Your content is secure and confidential</p>
+          </div>
+        )}
       </div>
     </div>
   );
