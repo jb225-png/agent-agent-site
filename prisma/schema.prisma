@@ -216,3 +216,28 @@ model WeeklyReport {
   @@index([clientId])
   @@index([weekStartDate])
 }
+
+// Free audit applications from landing page
+model AuditApplication {
+  id              String   @id @default(cuid())
+  name            String
+  email           String
+  businessName    String?
+  website         String?
+  revenue         String
+  contentTypes    String[] // Array of selected content types
+  platforms       String[] // Array of selected platforms
+  biggestChallenge String? @db.Text
+  contentSample   String   @db.Text
+  status          String   @default("pending") // pending, processing, completed, converted
+  pieceId         String?  // Link to created Piece for pipeline
+  pdfUrl          String?  // Generated audit PDF
+  calendarBooked  Boolean  @default(false)
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
