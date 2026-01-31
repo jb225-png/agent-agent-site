@@ -45,8 +45,8 @@ const PLATFORM_OPTIONS = [
   "YouTube",
 ];
 
-// [CONFIG: CALENDLY_URL] - Replace with actual Calendly link from Robert
-const CALENDLY_URL = "https://calendly.com/your-link-here";
+// Calendly URL for booking audit review calls
+const CALENDLY_URL = "https://calendly.com/rbb-outreach/new-meeting";
 
 export default function AuditApplyPage() {
   const [step, setStep] = useState(1);

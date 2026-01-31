@@ -1,305 +1,321 @@
-"use client";
-
-import { useState } from "react";
+/* eslint-disable react/no-unescaped-entities */
 import Link from "next/link";
 
-const CALENDLY_URL = "https://calendly.com/rbb-outreach/new-meeting";
+// LANDING PAGE - Sales page for Free Content Audit
+// Brand: Deep Blue (#1E3A8A), Teal (#0D9488), Amber (#F59E0B)
+// Font: Inter
 
-const revenueRanges = [
-  "Under $100k",
-  "$100k - $250k",
-  "$250k - $500k",
-  "$500k - $1M",
-  "$1M - $3M",
-  "$3M - $5M",
-  "$5M+",
-];
-
-const niches = [
-  "Executive Coaching",
-  "Business Coaching",
-  "Leadership Development",
-  "Sales Coaching",
-  "Life Coaching",
-  "Career Coaching",
-  "Health & Wellness Coaching",
-  "Mindset / Performance",
-  "Other",
-];
-
-const painPoints = [
-  "I spend too much time creating content",
-  "My content is scattered everywhere",
-  "I don&apos;t know what to post or when",
-  "I&apos;m not getting results from my content",
-  "I can&apos;t afford a full-time marketing person",
-  "I start strong but can&apos;t stay consistent",
-  "I have great ideas but no system to capture them",
-];
-
-export default function AuditPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    niche: "",
-    otherNiche: "",
-    revenue: "",
-    contentLinks: "",
-    painPoints: [] as string[],
-    otherPain: "",
-    currentProcess: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handlePainPointToggle = (point: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      painPoints: prev.painPoints.includes(point)
-        ? prev.painPoints.filter((p) => p !== point)
-        : [...prev.painPoints, point],
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      // Save the audit request
-      await fetch("/api/audit/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      setIsSubmitted(true);
-      
-      // Redirect to Calendly after short delay
-      setTimeout(() => {
-        window.location.href = CALENDLY_URL;
-      }, 2000);
-    } catch (error) {
-      console.error("Error submitting audit:", error);
-      // Still redirect to Calendly even if save fails
-      window.location.href = CALENDLY_URL;
-    }
-  };
-
-  if (isSubmitted) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center max-w-md px-6">
-          <div className="text-6xl mb-6">✅</div>
-          <h1 className="text-2xl font-bold mb-4">You&apos;re In!</h1>
-          <p className="text-gray-600 mb-6">
-            Redirecting you to book your free audit call...
-          </p>
-          <p className="text-sm text-gray-400">
-            Not redirecting?{" "}
-            <a href={CALENDLY_URL} className="text-black underline">
-              Click here
-            </a>
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+export default function AuditLandingPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-2xl mx-auto px-6 py-12">
-        <div className="mb-8">
-          <Link href="/" className="text-sm text-gray-500 hover:text-black">
-            ← Back
+      {/* Hero Section */}
+      <section className="max-w-5xl mx-auto px-6 py-20 text-center">
+        <div className="inline-block bg-[#0D9488]/10 text-[#0D9488] px-4 py-1.5 text-sm font-medium rounded-full mb-6">
+          For Executive Coaches Making $500K-5M/Year
+        </div>
+        <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight text-gray-900">
+          Fire Your $6K/Month<br />
+          <span className="text-[#1E3A8A]">Marketing Manager</span>
+        </h1>
+        <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+          Turn one podcast episode into 30 days of content. 
+          No more blank screens. No more "what should I post?"
+        </p>
+        <Link
+          href="/audit/apply"
+          className="inline-block bg-[#1E3A8A] text-white px-10 py-5 text-xl font-semibold hover:bg-[#1e3a8a]/90 transition-colors"
+        >
+          Get Your Free Content Audit →
+        </Link>
+        <p className="text-sm text-gray-500 mt-4">
+          Takes 5 minutes • See exactly what we'd create from your content
+        </p>
+      </section>
+
+      {/* Problem Section */}
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-900">
+            You're Sitting on a <span className="text-[#0D9488]">Gold Mine</span> of Content
+          </h2>
+          <div className="grid md:grid-cols-2 gap-4 text-lg">
+            <div className="bg-white p-6 border border-gray-200">
+              <span className="text-[#F59E0B] font-bold">→</span> You've done 50+ podcast episodes, but they're just sitting there
+            </div>
+            <div className="bg-white p-6 border border-gray-200">
+              <span className="text-[#F59E0B] font-bold">→</span> You spend 10+ hours/week on content and still feel behind
+            </div>
+            <div className="bg-white p-6 border border-gray-200">
+              <span className="text-[#F59E0B] font-bold">→</span> Your marketing manager costs $6k/month and you're not sure what they do
+            </div>
+            <div className="bg-white p-6 border border-gray-200">
+              <span className="text-[#F59E0B] font-bold">→</span> You know content = clients, but the grind is killing you
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison Section */}
+      <section className="py-20">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center text-gray-900">
+            The Old Way vs. <span className="text-[#1E3A8A]">Agent→Agent</span>
+          </h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Old Way */}
+            <div className="border border-gray-200 p-8 bg-gray-50">
+              <h3 className="text-xl font-bold mb-6 text-gray-400">❌ The Old Way</h3>
+              <ul className="space-y-4 text-gray-600">
+                <li className="flex items-start gap-3">
+                  <span className="text-gray-400">•</span>
+                  <span>Hire a $6k/month marketing manager</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-gray-400">•</span>
+                  <span>Spend 10-15 hours/week on content</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-gray-400">•</span>
+                  <span>Stare at blank screens wondering what to post</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-gray-400">•</span>
+                  <span>Content sits in folders, never repurposed</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-gray-400">•</span>
+                  <span>Inconsistent posting = inconsistent leads</span>
+                </li>
+              </ul>
+            </div>
+            {/* New Way */}
+            <div className="border-2 border-[#1E3A8A] p-8">
+              <h3 className="text-xl font-bold mb-6 text-[#1E3A8A]">✓ The Agent→Agent Way</h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <span className="text-[#0D9488] font-bold">✓</span>
+                  <span>Upload one piece of content</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-[#0D9488] font-bold">✓</span>
+                  <span>Get 20-30 platform-ready pieces back</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-[#0D9488] font-bold">✓</span>
+                  <span>30-day calendar with exact posting schedule</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-[#0D9488] font-bold">✓</span>
+                  <span>LinkedIn, Twitter, Email, Instagram — all done</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-[#0D9488] font-bold">✓</span>
+                  <span>Fraction of the cost, 10x the output</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center text-gray-900">
+            How It Works
+          </h2>
+          <div className="space-y-8">
+            <div className="flex gap-6 items-start">
+              <div className="w-16 h-16 bg-[#1E3A8A] text-white flex items-center justify-center text-2xl font-bold flex-shrink-0">
+                1
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-2">Send Us Your Content</h3>
+                <p className="text-gray-600">Podcast transcript, video, blog post, voice memo — whatever you've got.</p>
+              </div>
+            </div>
+            <div className="flex gap-6 items-start">
+              <div className="w-16 h-16 bg-[#0D9488] text-white flex items-center justify-center text-2xl font-bold flex-shrink-0">
+                2
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-2">Our AI Agents Go to Work</h3>
+                <p className="text-gray-600">4 specialized agents analyze, organize, repurpose, and schedule your content.</p>
+              </div>
+            </div>
+            <div className="flex gap-6 items-start">
+              <div className="w-16 h-16 bg-[#F59E0B] text-gray-900 flex items-center justify-center text-2xl font-bold flex-shrink-0">
+                3
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-2">Get Your Content Machine</h3>
+                <p className="text-gray-600">20-30 ready-to-post pieces + a 30-day calendar. Just copy, paste, post.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What You Get */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center text-gray-900">
+            What You Get Every Month
+          </h2>
+          <p className="text-center text-gray-600 mb-12">From a single content upload</p>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="border border-gray-200 p-6 hover:border-[#1E3A8A] transition-colors">
+              <div className="text-3xl font-bold text-[#1E3A8A] mb-2">5-7</div>
+              <h3 className="font-bold mb-2">LinkedIn Posts</h3>
+              <p className="text-gray-600 text-sm">Story posts, insight posts, listicles — formatted for the algorithm</p>
+            </div>
+            <div className="border border-gray-200 p-6 hover:border-[#1E3A8A] transition-colors">
+              <div className="text-3xl font-bold text-[#1E3A8A] mb-2">3-5</div>
+              <h3 className="font-bold mb-2">Twitter Threads</h3>
+              <p className="text-gray-600 text-sm">Hook + value + CTA structure that drives engagement</p>
+            </div>
+            <div className="border border-gray-200 p-6 hover:border-[#1E3A8A] transition-colors">
+              <div className="text-3xl font-bold text-[#1E3A8A] mb-2">5-7</div>
+              <h3 className="font-bold mb-2">Instagram Captions</h3>
+              <p className="text-gray-600 text-sm">With hashtag strategies and carousel suggestions</p>
+            </div>
+            <div className="border border-gray-200 p-6 hover:border-[#1E3A8A] transition-colors">
+              <div className="text-3xl font-bold text-[#0D9488] mb-2">1-2</div>
+              <h3 className="font-bold mb-2">Email Drafts</h3>
+              <p className="text-gray-600 text-sm">Newsletter-ready with subject lines that get opens</p>
+            </div>
+            <div className="border border-gray-200 p-6 hover:border-[#1E3A8A] transition-colors">
+              <div className="text-3xl font-bold text-[#0D9488] mb-2">1</div>
+              <h3 className="font-bold mb-2">Blog Outline</h3>
+              <p className="text-gray-600 text-sm">SEO-structured with headers, key points, and CTAs</p>
+            </div>
+            <div className="border border-gray-200 p-6 hover:border-[#1E3A8A] transition-colors">
+              <div className="text-3xl font-bold text-[#F59E0B] mb-2">30</div>
+              <h3 className="font-bold mb-2">Day Calendar</h3>
+              <p className="text-gray-600 text-sm">Exact dates, times, and platform rotation — just follow the plan</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+            Simple Pricing, <span className="text-[#0D9488]">Massive Value</span>
+          </h2>
+          <p className="text-gray-600 mb-12">
+            Choose the level of done-for-you that fits your business
+          </p>
+          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            {/* Tier 1 */}
+            <div className="border border-gray-200 p-8 text-left bg-white">
+              <h3 className="text-2xl font-bold mb-2 text-gray-900">Strategy</h3>
+              <p className="text-5xl font-extrabold text-[#1E3A8A] mb-1">$2,500</p>
+              <p className="text-gray-500 mb-6">/month</p>
+              <ul className="space-y-3 text-gray-600 mb-8">
+                <li className="flex items-center gap-2">
+                  <span className="text-[#0D9488]">✓</span> 20-30 pieces of content
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#0D9488]">✓</span> 30-day publishing calendar
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#0D9488]">✓</span> Platform recommendations
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#0D9488]">✓</span> Monthly strategy call
+                </li>
+              </ul>
+              <Link
+                href="/audit/apply"
+                className="block w-full border-2 border-[#1E3A8A] text-[#1E3A8A] py-3 text-center font-semibold hover:bg-[#1E3A8A] hover:text-white transition-colors"
+              >
+                Start Free Audit
+              </Link>
+            </div>
+            {/* Tier 2 */}
+            <div className="border-2 border-[#1E3A8A] p-8 text-left bg-[#1E3A8A] text-white relative">
+              <div className="absolute -top-3 right-4 bg-[#F59E0B] text-gray-900 px-3 py-1 text-xs font-bold">
+                MOST POPULAR
+              </div>
+              <h3 className="text-2xl font-bold mb-2">White-Glove</h3>
+              <p className="text-5xl font-extrabold mb-1">$4,500</p>
+              <p className="text-blue-200 mb-6">/month</p>
+              <ul className="space-y-3 text-blue-100 mb-8">
+                <li className="flex items-center gap-2">
+                  <span className="text-[#0D9488]">✓</span> Everything in Strategy
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#0D9488]">✓</span> We post everything for you
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#0D9488]">✓</span> Comment monitoring
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#0D9488]">✓</span> Weekly performance reports
+                </li>
+              </ul>
+              <Link
+                href="/audit/apply"
+                className="block w-full bg-white text-[#1E3A8A] py-3 text-center font-semibold hover:bg-gray-100 transition-colors"
+              >
+                Start Free Audit
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20">
+        <div className="max-w-3xl mx-auto px-6">
+          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center text-gray-900">
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-6">
+            <div className="border-b border-gray-200 pb-6">
+              <h3 className="font-bold text-lg mb-2">What kind of content do I need to provide?</h3>
+              <p className="text-gray-600">Anything with your voice and ideas — podcast transcripts, video transcripts, blog posts, voice memos, even rough notes. The more raw material, the more we can create.</p>
+            </div>
+            <div className="border-b border-gray-200 pb-6">
+              <h3 className="font-bold text-lg mb-2">How is this different from ChatGPT?</h3>
+              <p className="text-gray-600">ChatGPT gives you one piece at a time. We give you an entire content operation — organized library, repurposed content for every platform, and a complete posting schedule. It's the difference between a tool and a system.</p>
+            </div>
+            <div className="border-b border-gray-200 pb-6">
+              <h3 className="font-bold text-lg mb-2">What's included in the free audit?</h3>
+              <p className="text-gray-600">Send us 2-3 pieces of your existing content. We'll run it through our system and show you exactly what we'd create — sample posts, calendar preview, and gap analysis. No obligation.</p>
+            </div>
+            <div className="border-b border-gray-200 pb-6">
+              <h3 className="font-bold text-lg mb-2">Who is this for?</h3>
+              <p className="text-gray-600">Executive coaches, business coaches, and consultants doing $500k-5M/year who know content drives clients but hate the content grind.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="bg-[#1E3A8A] text-white py-20">
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
+            Ready to See What We Can Create?
+          </h2>
+          <p className="text-xl text-blue-200 mb-8">
+            Get your free content audit. No commitment. Just results.
+          </p>
+          <Link
+            href="/audit/apply"
+            className="inline-block bg-[#F59E0B] text-gray-900 px-10 py-5 text-xl font-semibold hover:bg-[#fbbf24] transition-colors"
+          >
+            Get Your Free Content Audit →
           </Link>
         </div>
+      </section>
 
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold mb-3">Free Content Audit</h1>
-          <p className="text-lg text-gray-600">
-            We&apos;ll analyze your content and show you how to save $2,000-6,000/month 
-            while getting better results.
-          </p>
-        </div>
-
-        {/* What You Get */}
-        <div className="mb-10 p-6 bg-gray-50 border border-gray-200">
-          <h2 className="font-semibold mb-4">What You&apos;ll Get (Free):</h2>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-start gap-2">
-              <span className="text-green-600">✓</span>
-              <span>Complete audit of your existing content</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-600">✓</span>
-              <span>Gap analysis — what&apos;s missing from your content strategy</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-600">✓</span>
-              <span>90-day content calendar (what to post, when, where)</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-600">✓</span>
-              <span>3-5 sample repurposed pieces from YOUR content</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-600">✓</span>
-              <span>30-minute strategy call to walk through everything</span>
-            </li>
-          </ul>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Basic Info */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg border-b pb-2">About You</h3>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Name *</label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                placeholder="Your name"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Email *</label>
-              <input
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                placeholder="you@example.com"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Coaching Niche *</label>
-              <select
-                required
-                value={formData.niche}
-                onChange={(e) => setFormData({ ...formData, niche: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"
-              >
-                <option value="">Select your niche...</option>
-                {niches.map((niche) => (
-                  <option key={niche} value={niche}>{niche}</option>
-                ))}
-              </select>
-              {formData.niche === "Other" && (
-                <input
-                  type="text"
-                  value={formData.otherNiche}
-                  onChange={(e) => setFormData({ ...formData, otherNiche: e.target.value })}
-                  className="w-full mt-2 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                  placeholder="Describe your niche"
-                />
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Annual Revenue *</label>
-              <select
-                required
-                value={formData.revenue}
-                onChange={(e) => setFormData({ ...formData, revenue: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"
-              >
-                <option value="">Select range...</option>
-                {revenueRanges.map((range) => (
-                  <option key={range} value={range}>{range}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Content Links */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg border-b pb-2">Your Content</h3>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Links to 5-10 pieces of your content *
-              </label>
-              <p className="text-xs text-gray-500 mb-2">
-                LinkedIn posts, podcast episodes, YouTube videos, blog posts — anything you&apos;ve created
-              </p>
-              <textarea
-                required
-                value={formData.contentLinks}
-                onChange={(e) => setFormData({ ...formData, contentLinks: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-black h-32"
-                placeholder="Paste links here, one per line..."
-              />
-            </div>
-          </div>
-
-          {/* Pain Points */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg border-b pb-2">Your Challenges</h3>
-            
-            <div>
-              <label className="block text-sm font-medium mb-3">
-                What&apos;s frustrating you about content? (Select all that apply)
-              </label>
-              <div className="space-y-2">
-                {painPoints.map((point) => (
-                  <label key={point} className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.painPoints.includes(point)}
-                      onChange={() => handlePainPointToggle(point)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm">{point}</span>
-                  </label>
-                ))}
-              </div>
-              <input
-                type="text"
-                value={formData.otherPain}
-                onChange={(e) => setFormData({ ...formData, otherPain: e.target.value })}
-                className="w-full mt-3 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                placeholder="Other challenges..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                How do you currently handle content?
-              </label>
-              <textarea
-                value={formData.currentProcess}
-                onChange={(e) => setFormData({ ...formData, currentProcess: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-black h-24"
-                placeholder="Do you have a VA? Marketing manager? Do it yourself? Outsource to an agency?"
-              />
-            </div>
-          </div>
-
-          {/* Submit */}
-          <div className="pt-4">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-4 bg-black text-white font-semibold rounded hover:bg-gray-800 transition-colors disabled:bg-gray-400"
-            >
-              {isSubmitting ? "Submitting..." : "Get My Free Audit →"}
-            </button>
-            <p className="text-xs text-gray-500 text-center mt-3">
-              After submitting, you&apos;ll book a 30-minute call to review your audit together.
-            </p>
-          </div>
-        </form>
-      </div>
+      {/* Footer */}
+      <footer className="py-8 text-center text-gray-500 text-sm border-t border-gray-200">
+        <p>© 2026 Agent→Agent. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
