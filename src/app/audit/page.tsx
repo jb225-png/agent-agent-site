@@ -30,10 +30,10 @@ const niches = [
 const painPoints = [
   "I spend too much time creating content",
   "My content is scattered everywhere",
-  "I don't know what to post or when",
-  "I'm not getting results from my content",
-  "I can't afford a full-time marketing person",
-  "I start strong but can't stay consistent",
+  "I don&apos;t know what to post or when",
+  "I&apos;m not getting results from my content",
+  "I can&apos;t afford a full-time marketing person",
+  "I start strong but can&apos;t stay consistent",
   "I have great ideas but no system to capture them",
 ];
 
@@ -91,7 +91,7 @@ export default function AuditPage() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center max-w-md px-6">
           <div className="text-6xl mb-6">✅</div>
-          <h1 className="text-2xl font-bold mb-4">You're In!</h1>
+          <h1 className="text-2xl font-bold mb-4">You&apos;re In!</h1>
           <p className="text-gray-600 mb-6">
             Redirecting you to book your free audit call...
           </p>
@@ -119,14 +119,14 @@ export default function AuditPage() {
         <div className="mb-10">
           <h1 className="text-3xl font-bold mb-3">Free Content Audit</h1>
           <p className="text-lg text-gray-600">
-            We'll analyze your content and show you how to save $2,000-6,000/month 
+            We&apos;ll analyze your content and show you how to save $2,000-6,000/month 
             while getting better results.
           </p>
         </div>
 
         {/* What You Get */}
         <div className="mb-10 p-6 bg-gray-50 border border-gray-200">
-          <h2 className="font-semibold mb-4">What You'll Get (Free):</h2>
+          <h2 className="font-semibold mb-4">What You&apos;ll Get (Free):</h2>
           <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2">
               <span className="text-green-600">✓</span>
@@ -134,7 +134,7 @@ export default function AuditPage() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-600">✓</span>
-              <span>Gap analysis — what's missing from your content strategy</span>
+              <span>Gap analysis — what&apos;s missing from your content strategy</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-600">✓</span>
@@ -230,7 +230,7 @@ export default function AuditPage() {
                 Links to 5-10 pieces of your content *
               </label>
               <p className="text-xs text-gray-500 mb-2">
-                LinkedIn posts, podcast episodes, YouTube videos, blog posts — anything you've created
+                LinkedIn posts, podcast episodes, YouTube videos, blog posts — anything you&apos;ve created
               </p>
               <textarea
                 required
@@ -248,7 +248,7 @@ export default function AuditPage() {
             
             <div>
               <label className="block text-sm font-medium mb-3">
-                What's frustrating you about content? (Select all that apply)
+                What&apos;s frustrating you about content? (Select all that apply)
               </label>
               <div className="space-y-2">
                 {painPoints.map((point) => (
@@ -295,7 +295,7 @@ export default function AuditPage() {
               {isSubmitting ? "Submitting..." : "Get My Free Audit →"}
             </button>
             <p className="text-xs text-gray-500 text-center mt-3">
-              After submitting, you'll book a 30-minute call to review your audit together.
+              After submitting, you&apos;ll book a 30-minute call to review your audit together.
             </p>
           </div>
         </form>
