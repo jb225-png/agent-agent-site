@@ -164,7 +164,7 @@ export default function AuditLandingPage() {
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center text-gray-900">
-            30 LinkedIn Posts. Every Month.
+            30 LinkedIn Posts. Ready to Go.
           </h2>
           <p className="text-center text-gray-600 mb-12">Variety that keeps your audience hooked</p>
           <div className="grid md:grid-cols-3 gap-6">
