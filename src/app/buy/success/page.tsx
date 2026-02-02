@@ -1,13 +1,13 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 // SUCCESS PAGE - Content drop after payment
 // Brand: Deep Blue (#1E3A8A), Teal (#0D9488), Amber (#F59E0B)
 
-export default function BuySuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
   
@@ -171,5 +171,21 @@ export default function BuySuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-gray-500">Loading...</div>
+    </div>
+  );
+}
+
+export default function BuySuccessPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <SuccessContent />
+    </Suspense>
   );
 }
