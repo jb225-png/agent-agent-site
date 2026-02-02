@@ -79,7 +79,7 @@ export default function BuyPage() {
                 Get Your Content Starter Pack
               </h1>
               <p className="text-gray-600 mb-8">
-                Fill in your details and paste your content. We&apos;ll deliver your 30-day content calendar within 48 hours.
+                Fill in your details and paste your content. We&apos;ll deliver your 30-day content calendar within minutes.
               </p>
 
               <div className="space-y-6">
@@ -180,7 +180,7 @@ export default function BuyPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#0D9488] mt-0.5">✓</span>
-                  <span>Delivered in 48 hours</span>
+                  <span>Delivered in minutes</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#0D9488] mt-0.5">✓</span>
@@ -197,7 +197,7 @@ export default function BuyPage() {
 
               <div className="mt-6 p-4 bg-gray-50 border border-gray-200">
                 <p className="text-sm text-gray-600">
-                  <span className="font-semibold text-gray-900">How it works:</span> After payment, our AI agents analyze your content and generate your complete content calendar. You&apos;ll receive an email with your Notion workspace within 48 hours.
+                  <span className="font-semibold text-gray-900">How it works:</span> After payment, our AI agents analyze your content and generate your complete content calendar. You&apos;ll receive an email with your Notion workspace within minutes.
                 </p>
               </div>
 

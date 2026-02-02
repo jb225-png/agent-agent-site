@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
               name: "Content Starter Pack",
               description: "30-day content calendar with 20-30 platform-ready pieces",
             },
-            unit_amount: 29700, // $297.00 in cents
+            unit_amount: 3900, // $39.00 in cents
           },
           quantity: 1,
         },
