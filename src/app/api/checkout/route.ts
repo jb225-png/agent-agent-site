@@ -1,44 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { prisma } from "@/lib/db";
 
 // Initialize Stripe with secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-// Helper to count words
-function countWords(text: string): number {
-  return text.trim().split(/\s+/).filter(Boolean).length;
-}
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, businessName, contentSample } = body;
+    const { name, email } = body;
 
     // Validate required fields
-    if (!name || !email || !contentSample) {
+    if (!name || !email) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    // First, create the audit application to store the content
-    const auditApp = await prisma.auditApplication.create({
-      data: {
-        name,
-        email,
-        businessName: businessName || null,
-        revenue: "$997 Purchase", // Mark as purchase
-        contentTypes: ["purchase"],
-        platforms: [],
-        contentSample,
-        status: "pending_payment",
-      },
-    });
-
     // Create Stripe Checkout Session
-    const baseUrl = "https://agent-agent-gilt.vercel.app";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://agent-agent-gilt.vercel.app";
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -46,8 +26,8 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "Content Starter Pack",
-              description: "30-day content calendar with 20-30 platform-ready pieces",
+              name: "30 LinkedIn Posts",
+              description: "30-day content calendar with platform-ready LinkedIn posts",
             },
             unit_amount: 3900, // $39.00 in cents
           },
@@ -59,18 +39,8 @@ export async function POST(request: NextRequest) {
       cancel_url: `${baseUrl}/buy`,
       customer_email: email,
       metadata: {
-        auditApplicationId: auditApp.id,
         name,
         email,
-        businessName: businessName || "",
-      },
-    });
-
-    // Update the audit application with the Stripe session ID
-    await prisma.auditApplication.update({
-      where: { id: auditApp.id },
-      data: { 
-        notes: `Stripe Session: ${session.id}`,
       },
     });
 

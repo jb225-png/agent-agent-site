@@ -3,33 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 
-// BUY PAGE - $997 Content Starter (No-call checkout)
+// BUY PAGE - Simple checkout, content drop comes AFTER payment
 // Brand: Deep Blue (#1E3A8A), Teal (#0D9488), Amber (#F59E0B)
-
-interface FormData {
-  name: string;
-  email: string;
-  businessName: string;
-  contentSample: string;
-}
 
 export default function BuyPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    name: "",
-    email: "",
-    businessName: "",
-    contentSample: "",
-  });
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
-  const updateField = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const isFormValid = 
-    formData.name.trim() !== "" && 
-    formData.email.trim() !== "" && 
-    formData.contentSample.length >= 200;
+  const isFormValid = name.trim() !== "" && email.trim() !== "";
 
   const handleCheckout = async () => {
     if (!isFormValid) return;
@@ -40,13 +22,12 @@ export default function BuyPage() {
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ name, email }),
       });
       
       const data = await response.json();
       
       if (data.url) {
-        // Redirect to Stripe Checkout
         window.location.href = data.url;
       } else {
         alert("Something went wrong. Please try again.");
@@ -76,10 +57,10 @@ export default function BuyPage() {
           <div className="md:col-span-3">
             <div className="bg-white border border-gray-200 p-8 shadow-sm">
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                Get Your Content Starter Pack
+                Get Your 30 LinkedIn Posts
               </h1>
               <p className="text-gray-600 mb-8">
-                Fill in your details and paste your content. We&apos;ll deliver your 30-day content calendar within minutes.
+                One-time payment. Drop your content after checkout.
               </p>
 
               <div className="space-y-6">
@@ -87,8 +68,8 @@ export default function BuyPage() {
                   <label className="block font-medium mb-2 text-gray-900">Your Name *</label>
                   <input
                     type="text"
-                    value={formData.name}
-                    onChange={(e) => updateField("name", e.target.value)}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     className="w-full border border-gray-300 px-4 py-3 focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488] focus:outline-none transition-colors"
                     placeholder="Jane Smith"
                   />
@@ -98,46 +79,14 @@ export default function BuyPage() {
                   <label className="block font-medium mb-2 text-gray-900">Email *</label>
                   <input
                     type="email"
-                    value={formData.email}
-                    onChange={(e) => updateField("email", e.target.value)}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full border border-gray-300 px-4 py-3 focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488] focus:outline-none transition-colors"
                     placeholder="jane@example.com"
                   />
-                </div>
-
-                <div>
-                  <label className="block font-medium mb-2 text-gray-900">Business Name</label>
-                  <input
-                    type="text"
-                    value={formData.businessName}
-                    onChange={(e) => updateField("businessName", e.target.value)}
-                    className="w-full border border-gray-300 px-4 py-3 focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488] focus:outline-none transition-colors"
-                    placeholder="Smith Coaching"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-medium mb-2 text-gray-900">
-                    Your Content *
-                  </label>
-                  <p className="text-sm text-gray-500 mb-2">
-                    Paste a podcast transcript, blog post, video script, or any content you want repurposed.
+                  <p className="text-sm text-gray-500 mt-2">
+                    We&apos;ll send your content calendar to this email.
                   </p>
-                  <textarea
-                    value={formData.contentSample}
-                    onChange={(e) => updateField("contentSample", e.target.value)}
-                    className="w-full border border-gray-300 px-4 py-3 focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488] focus:outline-none h-48 resize-none font-mono text-sm transition-colors"
-                    placeholder="Paste your content here..."
-                  />
-                  <div className="flex justify-between mt-2">
-                    <p className="text-sm text-gray-500">
-                      Minimum 200 characters
-                    </p>
-                    <p className={`text-sm ${formData.contentSample.length >= 200 ? "text-[#0D9488]" : "text-gray-500"}`}>
-                      {formData.contentSample.length} characters
-                      {formData.contentSample.length >= 200 && " ✓"}
-                    </p>
-                  </div>
                 </div>
 
                 <button
@@ -161,14 +110,14 @@ export default function BuyPage() {
               <h2 className="font-bold text-lg text-gray-900 mb-4">Order Summary</h2>
               
               <div className="border-b border-gray-200 pb-4 mb-4">
-                <h3 className="font-semibold text-gray-900">Content Starter Pack</h3>
+                <h3 className="font-semibold text-gray-900">30 LinkedIn Posts</h3>
                 <p className="text-sm text-gray-600">One-time purchase</p>
               </div>
 
               <ul className="space-y-3 text-sm text-gray-600 mb-6">
                 <li className="flex items-start gap-2">
                   <span className="text-[#0D9488] mt-0.5">✓</span>
-                  <span>20-30 platform-ready content pieces</span>
+                  <span>30 platform-ready LinkedIn posts</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#0D9488] mt-0.5">✓</span>
@@ -176,15 +125,11 @@ export default function BuyPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#0D9488] mt-0.5">✓</span>
-                  <span>30 LinkedIn posts ready to copy-paste</span>
+                  <span>Mix of stories, insights, how-tos</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#0D9488] mt-0.5">✓</span>
                   <span>Delivered in minutes</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#0D9488] mt-0.5">✓</span>
-                  <span>Notion workspace you keep forever</span>
                 </li>
               </ul>
 
@@ -195,15 +140,14 @@ export default function BuyPage() {
                 </div>
               </div>
 
-              <div className="mt-6 p-4 bg-gray-50 border border-gray-200">
-                <p className="text-sm text-gray-600">
-                  <span className="font-semibold text-gray-900">How it works:</span> After payment, our AI agents analyze your content and generate your complete content calendar. You&apos;ll receive an email with your Notion workspace within minutes.
-                </p>
+              <div className="mt-6 p-4 bg-[#1E3A8A]/5 border border-[#1E3A8A]/20">
+                <p className="text-sm text-gray-700 font-medium mb-2">How it works:</p>
+                <ol className="text-sm text-gray-600 space-y-1">
+                  <li>1. Complete payment</li>
+                  <li>2. Drop your content (podcast, blog, notes)</li>
+                  <li>3. Get 30 posts delivered in minutes</li>
+                </ol>
               </div>
-
-              <p className="mt-4 text-xs text-gray-400 text-center">
-                All sales final. Refund requests reviewed on a case-by-case basis.
-              </p>
             </div>
           </div>
         </div>
