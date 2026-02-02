@@ -75,7 +75,8 @@ export default function PostPredictorPage() {
     if (lines.length > 5) score += 1;
     if (/^[-•→✓✗\d.]\s/m.test(text)) score += 2;
 
-    const emojiCount = (text.match(/[\u{1F300}-\u{1F9FF}]/gu) || []).length;
+    // Count emojis (simplified pattern)
+    const emojiCount = (text.match(/[\uD83C-\uDBFF\uDC00-\uDFFF]+/g) || []).length;
     if (emojiCount > 0 && emojiCount <= 5) score += 1;
     if (emojiCount > 8) score -= 1;
     if (text.includes("\n\n")) score += 1;
