@@ -220,11 +220,11 @@ export default function AuditLandingPage() {
             <h3 className="text-2xl font-bold mb-4 text-gray-900">Agent→Agent</h3>
             <div className="flex items-baseline gap-2 mb-6">
               <p className="text-5xl font-extrabold text-[#1E3A8A]">$39</p>
-              <p className="text-gray-500">/month</p>
+              <p className="text-gray-500">one-time</p>
             </div>
             <ul className="space-y-3 text-gray-600 mb-8">
               <li className="flex items-center gap-2">
-                <span className="text-[#0D9488] font-bold">✓</span> 30 LinkedIn posts monthly
+                <span className="text-[#0D9488] font-bold">✓</span> 30 LinkedIn posts
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#0D9488] font-bold">✓</span> 30-day publishing calendar
@@ -239,7 +239,7 @@ export default function AuditLandingPage() {
                 <span className="text-[#0D9488] font-bold">✓</span> Generated in minutes
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-[#0D9488] font-bold">✓</span> Cancel anytime
+                <span className="text-[#0D9488] font-bold">✓</span> Yours to keep forever
               </li>
             </ul>
             <Link
