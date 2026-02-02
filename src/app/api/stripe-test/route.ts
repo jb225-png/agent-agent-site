@@ -17,9 +17,7 @@ export async function GET() {
   const keyLength = key.length;
   
   try {
-    const stripe = new Stripe(key, {
-      apiVersion: "2023-10-16",
-    });
+    const stripe = new Stripe(key);
     
     // Try to list products (simple API call)
     const products = await stripe.products.list({ limit: 1 });
