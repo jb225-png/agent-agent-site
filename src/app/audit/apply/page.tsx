@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 // FREE AUDIT APPLICATION FORM
@@ -13,45 +14,31 @@ interface FormData {
   website: string;
   revenue: string;
   contentTypes: string[];
-  platforms: string[];
   biggestChallenge: string;
   contentSample: string;
 }
 
 const REVENUE_OPTIONS = [
-  "Under $250k",
+  "Under $100k",
+  "$100k - $250k",
   "$250k - $500k",
   "$500k - $1M",
-  "$1M - $3M",
-  "$3M - $5M",
-  "$5M+",
+  "$1M+",
 ];
 
 const CONTENT_TYPE_OPTIONS = [
-  "Podcast episodes",
-  "Video content",
+  "Podcast transcripts",
   "Blog posts",
-  "Voice memos/notes",
-  "Webinar recordings",
+  "Webinar transcripts",
   "Course content",
+  "Notes/outlines",
+  "Other written content",
 ];
-
-const PLATFORM_OPTIONS = [
-  "LinkedIn",
-  "Twitter/X",
-  "Instagram",
-  "Email newsletter",
-  "Blog/Website",
-  "YouTube",
-];
-
-// Calendly URL for booking audit review calls
-const CALENDLY_URL = "https://calendly.com/rbb-outreach/new-meeting";
 
 export default function AuditApplyPage() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -59,7 +46,6 @@ export default function AuditApplyPage() {
     website: "",
     revenue: "",
     contentTypes: [],
-    platforms: [],
     biggestChallenge: "",
     contentSample: "",
   });
@@ -68,7 +54,7 @@ export default function AuditApplyPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const toggleArrayField = (field: "contentTypes" | "platforms", value: string) => {
+  const toggleArrayField = (field: "contentTypes", value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: prev[field].includes(value)
@@ -81,21 +67,26 @@ export default function AuditApplyPage() {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch("/api/audit/submit", {
+      // Save the submission in background (don't wait for it)
+      fetch("/api/audit/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          platforms: ["LinkedIn"],
+        }),
+      }).catch(console.error);
+      
+      // Redirect to results page with content
+      const params = new URLSearchParams({
+        content: encodeURIComponent(formData.contentSample),
+        name: encodeURIComponent(formData.name),
       });
       
-      if (response.ok) {
-        setSubmitted(true);
-      } else {
-        alert("Something went wrong. Please try again.");
-      }
+      router.push(`/audit/results?${params.toString()}`);
     } catch (error) {
       console.error("Submit error:", error);
       alert("Something went wrong. Please try again.");
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -176,7 +167,7 @@ export default function AuditApplyPage() {
     </div>
   );
 
-  // Step 2: Content & Platforms
+  // Step 2: Content Info
   const renderStep2 = () => (
     <div className="space-y-6">
       <div>
@@ -186,6 +177,7 @@ export default function AuditApplyPage() {
       
       <div>
         <label className="block font-medium mb-3 text-gray-900">What content do you already have? *</label>
+        <p className="text-sm text-gray-500 mb-3">Select all that apply — we work with text-based content</p>
         <div className="grid grid-cols-2 gap-2">
           {CONTENT_TYPE_OPTIONS.map((opt) => (
             <button
@@ -204,24 +196,10 @@ export default function AuditApplyPage() {
         </div>
       </div>
 
-      <div>
-        <label className="block font-medium mb-3 text-gray-900">Which platforms do you want to post on? *</label>
-        <div className="grid grid-cols-2 gap-2">
-          {PLATFORM_OPTIONS.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => toggleArrayField("platforms", opt)}
-              className={`px-4 py-3 border text-left text-sm transition-colors ${
-                formData.platforms.includes(opt)
-                  ? "border-[#0D9488] bg-[#0D9488] text-white"
-                  : "border-gray-300 hover:border-[#0D9488]"
-              }`}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
+      <div className="bg-[#0D9488]/10 border border-[#0D9488]/20 p-4">
+        <p className="text-sm text-[#0D9488] font-medium">
+          🎯 We&apos;ll turn your content into 30 LinkedIn posts optimized for engagement
+        </p>
       </div>
 
       <div>
@@ -245,7 +223,7 @@ export default function AuditApplyPage() {
         </button>
         <button
           onClick={() => setStep(3)}
-          disabled={formData.contentTypes.length === 0 || formData.platforms.length === 0}
+          disabled={formData.contentTypes.length === 0}
           className="flex-1 bg-[#1E3A8A] text-white py-4 font-semibold hover:bg-[#1e3a8a]/90 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
         >
           Continue →
@@ -260,7 +238,7 @@ export default function AuditApplyPage() {
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Share a content sample</h2>
         <p className="text-gray-600 mt-1">
-          This is what we&apos;ll use for your free audit. The more you share, the better we can show you what&apos;s possible.
+          Paste your text content below. The more you share, the better we can show you what&apos;s possible.
         </p>
       </div>
       
@@ -274,7 +252,7 @@ export default function AuditApplyPage() {
         />
         <div className="flex justify-between mt-2">
           <p className="text-sm text-gray-500">
-            Paste a transcript, blog post, voice memo notes, etc.
+            Paste a transcript, blog post, notes, etc.
           </p>
           <p className={`text-sm ${formData.contentSample.length >= 500 ? "text-[#0D9488]" : "text-gray-500"}`}>
             {formData.contentSample.length} characters
@@ -295,7 +273,7 @@ export default function AuditApplyPage() {
           disabled={formData.contentSample.length < 200 || isSubmitting}
           className="flex-1 bg-[#0D9488] text-white py-4 font-semibold hover:bg-[#0D9488]/90 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
         >
-          {isSubmitting ? "Submitting..." : "Submit & Book Call →"}
+          {isSubmitting ? "Submitting..." : "Get My Free Audit →"}
         </button>
       </div>
       
@@ -304,44 +282,6 @@ export default function AuditApplyPage() {
           Please provide at least 200 characters for a meaningful audit.
         </p>
       )}
-    </div>
-  );
-
-  // Success state with Calendly
-  const renderSuccess = () => (
-    <div className="space-y-8">
-      <div className="text-center">
-        <div className="w-16 h-16 bg-[#0D9488] text-white flex items-center justify-center text-3xl mx-auto mb-4">
-          ✓
-        </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Received!</h2>
-        <p className="text-gray-600">
-          We&apos;re running your content through Agent→Agent now. 
-          Book a time below to review your audit results.
-        </p>
-      </div>
-      
-      {/* Calendly Embed */}
-      <div className="border border-gray-200 bg-gray-50 min-h-[600px] flex items-center justify-center">
-        <div className="text-center p-8">
-          <p className="text-gray-500 mb-4">Calendly booking widget will appear here</p>
-          <a 
-            href={CALENDLY_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-[#1E3A8A] text-white px-6 py-3 font-semibold hover:bg-[#1e3a8a]/90 transition-colors"
-          >
-            Book Your Call →
-          </a>
-        </div>
-      </div>
-      
-      <p className="text-center text-gray-500 text-sm">
-        Can&apos;t find a time that works?{" "}
-        <a href="mailto:rbb.outreach@gmail.com" className="text-[#1E3A8A] underline">
-          Email us
-        </a>
-      </p>
     </div>
   );
 
@@ -387,25 +327,17 @@ export default function AuditApplyPage() {
             </p>
           </div>
 
-          {!submitted && renderProgress()}
+          {renderProgress()}
 
-          {submitted ? (
-            renderSuccess()
-          ) : (
-            <>
-              {step === 1 && renderStep1()}
-              {step === 2 && renderStep2()}
-              {step === 3 && renderStep3()}
-            </>
-          )}
+          {step === 1 && renderStep1()}
+          {step === 2 && renderStep2()}
+          {step === 3 && renderStep3()}
         </div>
 
         {/* Trust indicators */}
-        {!submitted && (
-          <div className="mt-8 text-center text-sm text-gray-500">
-            <p>🔒 Your content is secure and confidential</p>
-          </div>
-        )}
+        <div className="mt-8 text-center text-sm text-gray-500">
+          <p>🔒 Your content is secure and confidential</p>
+        </div>
       </div>
     </div>
   );
